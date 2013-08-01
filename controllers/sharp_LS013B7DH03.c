@@ -2,6 +2,8 @@
 
 #if defined(GLCD_CONTROLLER_SHARP_LS013B7DH03)
 
+#include "string.h"
+
 void glcd_command(uint8_t c)
 {
 }
@@ -30,34 +32,36 @@ void glcd_set_x_address(uint8_t x)
 {
 }
 
-static uint8_t msb_to_lsb(uint8_t v)
+/*
+ * Use for MSB->LSB or LSB->MSB conversions of bytes.
+ */
+static uint8_t reverse_significant_bits(uint8_t v) {
+  uint8_t ret = (v & 0x01);
+
+  for(int i = 1; i < 8; i++ ) {
+    ret <<= 1;
+    v >>= 1;
+    if( v & 0x01 ) {
+      ret |= 0x01;
+    }
+  }
+  return(ret);
+}
+
+static uint8_t to_lsb(uint8_t v)
 {
-  //this assumes that the SPI peripheral is in LSB mode
+#if 1
+  /*
+   * This assumes that the SPI peripheral is in LSB mode.
+   */
   return(v);
+#else
+  /*
+   * This assumes that the SPI peripheral is in MSB mode.
+   */
+  return(reverse_significant_bits(v));
+#endif
 }
-
-bool_t sharp_lcd_write_line(const uint8_t line_number, const uint8_t *buff)
-{
-  if( line_number < 1 || line_number > MLCD_YRES ) {
-    return(false);
-  }
-
-  static uint8_t cmd_buff[1 + 1 + MLCD_BYTES_LINE + 2];
-  cmd_buff[0] = MLCD_WR_MSB;
-  cmd_buff[1] = msb_to_lsb(line_number);
-  for(int i = 0; i < MLCD_BYTES_LINE; i++ ) {
-    cmd_buff[2 + i] = msb_to_lsb(buff[i]);
-  }
-  cmd_buff[MLCD_BYTES_LINE + 2] = 0;//trailer
-  cmd_buff[MLCD_BYTES_LINE + 3] = 0;//trailer
-
-  GLCD_DESELECT();
-  glcd_spi_write_multibyte(sizeof(cmd_buff), cmd_buff);
-  GLCD_SELECT();
-
-  return(true);
-}
-
 
 void sharp_lcd_clear_screen(void)
 {
@@ -74,24 +78,44 @@ void sharp_lcd_clear_screen(void)
 /* Write screen buffer to display, within bounding box only */
 void glcd_write()
 {
-    //FIXME do bounding box logic
-    for(int row = 0; row < GLCD_LCD_HEIGHT; row++ ) {
-      uint8_t bank_number = (row / 8);
-      uint8_t bitmask = (1 << (row%8));
+    //for(int y_row = glcd_bbox_selected->y_min; y_row <= glcd_bbox_selected->y_max; y_row++ ) {
+    for(int y_row = 0; y_row < MLCD_YRES; y_row++ ) {
+      static uint8_t cmd_buff[1 + 1 + MLCD_BYTES_LINE + 2];
+      memset(cmd_buff, 0, sizeof(cmd_buff));
+      cmd_buff[0] = MLCD_WR_MSB;
+      uint8_t line_number = y_row;
 
-      static uint8_t reorg_buff[MLCD_BYTES_LINE];
-      for(int i = 0; i < MLCD_XRES; i++ ) {
-          //FIXME this is HORRIBLY inefficient, but functional for the moment...
-          uint8_t byte_offset = i / 8;
-          uint8_t bit_shift = (i%8);
-          if( glcd_get_pixel(i, row) ) {
-            reorg_buff[byte_offset] |= (1<<bit_shift);
-          } else {
-            reorg_buff[byte_offset] &= ~(1<<bit_shift);
+#if 1
+      //Rotated -90 degrees
+      for(int i = (GLCD_LCD_HEIGHT/8) - 1; i >= 0; i-- ) {
+        cmd_buff[2 + (MLCD_BYTES_LINE - 1 - i)] = reverse_significant_bits(glcd_buffer[y_row + (i * GLCD_LCD_WIDTH)]);
+        line_number = MLCD_YRES - 1 - y_row;
+      }
+#elif 1
+      //Rotated 90 degrees
+      for(int i = 0; i < (GLCD_LCD_HEIGHT/8); i++ ) {
+        cmd_buff[2 + i] = glcd_buffer[y_row + (i * GLCD_LCD_WIDTH)];
+      }
+#else
+      //No rotation
+      for(int x_column = 0; x_column < MLCD_XRES; x_column++ ) {
+          const uint8_t byte_offset = x_column / 8;
+          if( byte_offset > MLCD_BYTES_LINE ) {
+            //defensive programming, some bad math going on somewhere... This should not happen
+            break;
+          }
+          const uint8_t bit_shift = (x_column%8);
+          if( glcd_get_pixel(x_column, y_row) ) {
+            cmd_buff[2 + byte_offset] |= (1<<bit_shift);
           }
       }
+#endif
 
-      sharp_lcd_write_line((row + 1), reorg_buff);
+      cmd_buff[1] = to_lsb(line_number + 1);//lines are 1-based on the LCD itself
+
+      GLCD_DESELECT();
+      glcd_spi_write_multibyte(sizeof(cmd_buff), cmd_buff);
+      GLCD_SELECT();
     }
 
     /* Display updated, we can reset the bounding box */

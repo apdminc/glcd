@@ -37,6 +37,7 @@
 
 #define GLCD_DEVICE_STM32F4XX_CHIBIOS
 #define GLCD_CONTROLLER_SHARP_LS013B7DH03
+#define CHIBIOS_SPI_PEREPHERIAL       &SPID1
 
 
 #if defined(GLCD_DEVICE_AVR8)
@@ -73,7 +74,10 @@
 	#define PROGMEM
 	
 #elif defined(GLCD_DEVICE_STM32F4XX_CHIBIOS)
-    #define CHIBIOS_SPI_PEREPHERIAL       &SPID1
+    #ifndef CHIBIOS_SPI_PEREPHERIAL
+        #error "You must define CHIBIOS_SPI_PEREPHERIAL somewhere, E.G. #define CHIBIOS_SPI_PEREPHERIAL &SPID1"
+    #endif
+
     #define delay_ms(t)                   chThdSleepMilliseconds(t)
     #include "devices/STM32F4_ChibiOS.h"
     #define PROGMEM
