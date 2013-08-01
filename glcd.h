@@ -35,6 +35,10 @@
 #ifndef _GLCD_H
 #define _GLCD_H
 
+#define GLCD_DEVICE_STM32F4XX_CHIBIOS
+#define GLCD_CONTROLLER_SHARP_LS013B7DH03
+
+
 #if defined(GLCD_DEVICE_AVR8)
 	#include <avr/pgmspace.h>
 	#include <avr/io.h>
@@ -68,6 +72,12 @@
 	extern void delay_ms(uint32_t ms);
 	#define PROGMEM
 	
+#elif defined(GLCD_DEVICE_STM32F4XX_CHIBIOS)
+    #define CHIBIOS_SPI_PEREPHERIAL       &SPID1
+    #define delay_ms(t)                   chThdSleepMilliseconds(t)
+    #include "devices/STM32F4_ChibiOS.h"
+    #define PROGMEM
+
 #else
 	#error "Device not supported"
 	
@@ -81,7 +91,18 @@
 	
 #elif defined(GLCD_CONTROLLER_NT75451)
 	#include "controllers/NT75451.h"
-		
+
+#elif defined(GLCD_CONTROLLER_SHARP_LS013B7DH03)
+	/* Note: you must either externally toggle the VCOM pin at at least 1hz, or configure the chip
+	 * and toggle the vcom bit in the SPI payload. This code assumes external toggling.
+	 */
+    #include "controllers/sharp_LS013B7DH03.h"
+    #define   USE_SPI_MULTIBYTE
+
+    #if defined(GLCD_USE_PARALLEL)
+        #error "The SHARP_LS013B7DH03 must use SPI"
+    #endif
+
 #else
 	#error "Controller not supported"
 	
@@ -136,6 +157,9 @@
 	#elif defined(GLCD_CONTROLLER_ST7565R) || defined(GLCD_CONTROLLER_NT75451)
 		#define GLCD_LCD_WIDTH 128
 		#define GLCD_LCD_HEIGHT 64
+    #elif defined(GLCD_CONTROLLER_SHARP_LS013B7DH03)
+        #define GLCD_LCD_WIDTH 128
+        #define GLCD_LCD_HEIGHT 128
 	#else
 		#define GLCD_LCD_WIDTH 128
 		#define GLCD_LCD_HEIGHT 64

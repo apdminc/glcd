@@ -44,6 +44,9 @@
 	#include "LPC11Uxx.h"
 #elif defined(GLCD_DEVICE_STM32F0XX)
 	#include "STM32F0xx.h"
+#elif defined(GLCD_DEVICE_STM32F4XX_CHIBIOS)
+    #include "ch.h"
+    #include "hal.h"
 #else
 	#error "Device not supported"
 #endif
@@ -58,7 +61,18 @@
  */
 void glcd_init(void);
 
+
 #if !defined(GLCD_USE_PARALLEL)
+
+#ifdef USE_SPI_MULTIBYTE
+     /**
+     * Write multiple bytes to the connected SPI slave.
+     * \param length The number of bytes to be writen
+     * \param *source_buffer Pointer to the source data to be written
+     * \return Returned value from SPI (often not used)
+     */
+    void glcd_spi_write_multibyte(const uint16_t length, const uint8_t *source_buffer);
+#endif
 
 	/**
 	 * Write a byte to the connected SPI slave.
