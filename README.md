@@ -10,12 +10,14 @@ Works with:
 - PCD8544 based LCDs, e.g Nokia 3110 and 5110 LCDs
 - ST7565R serial interface (used in Newhaven Display NHD-C12864WC-FSW-FBW-3V3-M)
 - NT75451 parallel interface (used on NGX BlueBoards)
+- Sharp LS013B7DH03 (128x128, SPI)
 
 MCUs supported:
 - Atmel AVR 8-bit
 - NXP LPC111x ARM Cortex-M0
 - NXP LPC11Uxx ARM Cortex-M0
 - ST STM32 F0 ARM Cortex-M0
+- ST STM32 F4 ARM Cortex-M4 under ChibiOS
 
 Development boards tested on:
 - NGX BlueBoard LPC11U37 (with NT75451 graphic LCD)
@@ -31,12 +33,14 @@ Pick microcontroller type (pick one only):
 	GLCD_DEVICE_LPX11UXX
 	GLCD_DEVICE_AVR8
 	GLCD_DEVICE_STM32F0XX
+        GLCD_DEVICE_STM32F4XX_CHIBIOS
 
 Pick LCD controller type (pick one only):
 
 	GLCD_CONTROLLER_PCD8544
 	GLCD_CONTROLLER_ST7565R
 	GLCD_CONTROLLER_NT75451
+        GLCD_CONTROLLER_SHARP_LS013B7DH03
 
 If using a parallel interface LCD (e.g NT75451 on NGX BlueBoard):
 
