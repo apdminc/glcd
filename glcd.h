@@ -107,6 +107,8 @@
         #error "The SHARP_LS013B7DH03 must use SPI"
     #endif
 
+	void glcd_write_bounded(const int ymin, const int ymax);
+
 #else
 	#error "Controller not supported"
 	
