@@ -57,12 +57,12 @@ glcd_BoundingBox_t glcd_bbox;
 /**
  * Pointer to screen buffer currently in use.
  */
-uint8_t *glcd_buffer_selected;
+uint8_t *glcd_buffer_selected = NULL;
 
 /**
  * Pointer to bounding box currently in use.
  */
-glcd_BoundingBox_t *glcd_bbox_selected;
+glcd_BoundingBox_t *glcd_bbox_selected = NULL;
 
 /** @} */
 
