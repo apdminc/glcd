@@ -102,6 +102,10 @@
 	 */
     #include "controllers/sharp_LS013B7DH03.h"
     #define   USE_SPI_MULTIBYTE
+    #define BLACK 0
+    #define WHITE 1
+
+
 
     #if defined(GLCD_USE_PARALLEL)
         #error "The SHARP_LS013B7DH03 must use SPI"
@@ -129,8 +133,14 @@
  * \name Colour Constants
  * @{
  */
-#define BLACK 1
-#define WHITE 0
+#ifndef BLACK
+  #define BLACK 1
+#endif
+#ifndef WHITE
+  #define WHITE 0
+#endif
+#define FONT_COLOR_TEXT           WHITE
+#define FONT_COLOR_BACKGROUND     BLACK
 /**@}*/
 
 /**

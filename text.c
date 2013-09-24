@@ -76,9 +76,9 @@ uint8_t glcd_draw_char_xy(uint8_t x, uint8_t y, char c)
 					return 0;
 				}					
 				if (dat & (1<<j)) {
-					glcd_set_pixel(x+i,y+j,BLACK);
+					glcd_set_pixel(x+i,y+j,FONT_COLOR_TEXT);
 				} else {
-					glcd_set_pixel(x+i,y+j,WHITE);
+					glcd_set_pixel(x+i,y+j,FONT_COLOR_BACKGROUND);
 				}
 			}
 		}
@@ -126,9 +126,9 @@ uint8_t glcd_draw_char_xy(uint8_t x, uint8_t y, char c)
 					}					
 					
 					if (dat & (1<<bit)) {
-						glcd_set_pixel(x+i,y+j*8+bit,BLACK);
+						glcd_set_pixel(x+i,y+j*8+bit,FONT_COLOR_TEXT);
 					} else {
-						glcd_set_pixel(x+i,y+j*8+bit,WHITE);
+						glcd_set_pixel(x+i,y+j*8+bit,FONT_COLOR_BACKGROUND);
 					}
 				}									
 			}				

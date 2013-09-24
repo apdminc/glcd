@@ -127,6 +127,18 @@ void glcd_write_bounded(const int ymin, const int ymax)
     }
 #endif
 
+#if 1
+    //apply mirroring
+    for(int i = 0; i < ((GLCD_LCD_HEIGHT/8) / 2); i++ ) {
+      const int right_index = 2 + ((GLCD_LCD_HEIGHT/8) - 1 - i);
+      const int left_index = 2 + i;
+      uint8_t lhs = reverse_significant_bits(cmd_buff[right_index]);
+      uint8_t rhs = reverse_significant_bits(cmd_buff[left_index]);
+      cmd_buff[left_index] = lhs;
+      cmd_buff[right_index] = rhs;
+    }
+#endif
+
     cmd_buff[1] = to_lsb(line_number + 1);//lines are 1-based on the LCD itself
 
     GLCD_DESELECT();
