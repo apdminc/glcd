@@ -141,6 +141,8 @@
 #endif
 #define FONT_COLOR_TEXT           WHITE
 #define FONT_COLOR_BACKGROUND     BLACK
+#define GRAPH_COLOR_LINE           WHITE
+#define GRAPH_COLOR_BACKGROUND     BLACK
 /**@}*/
 
 /**

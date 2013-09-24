@@ -83,6 +83,10 @@ void glcd_bar_graph_vertical_no_border(uint8_t x, uint8_t y, uint8_t width, uint
 /** \todo write doc */
 void glcd_scrolling_bar_graph(uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t val);
 
+/** \todo write doc */
+void glcd_scrolling_line_graph(uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t val);
+
+
 /** @}*/
 
 #endif
