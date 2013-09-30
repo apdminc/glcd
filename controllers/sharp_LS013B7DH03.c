@@ -48,6 +48,23 @@ static uint8_t reverse_significant_bits(uint8_t v) {
   return(ret);
 }
 
+/**
+ * @brief  Reverse bit order of value
+ *
+ * @param  uint32_t value to reverse
+ * @return uint32_t reversed value
+ *
+ * Reverse bit order of value
+ */
+/*
+uint32_t __RBIT(uint32_t value)
+{
+  //FIXME this is a THUMB2 instruction suitable for single-cycle byte reversal. Use It!!!
+  __ASM("rbit r0, r0");
+  __ASM("bx lr");
+}
+*/
+
 static uint8_t to_lsb(uint8_t v)
 {
 #if 1
