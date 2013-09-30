@@ -37,7 +37,9 @@
 
 #define GLCD_DEVICE_STM32F4XX_CHIBIOS
 #define GLCD_CONTROLLER_SHARP_LS013B7DH03
+#define GLCD_USE_SPI_UART             TRUE
 #define CHIBIOS_SPI_PEREPHERIAL       &SPID1
+#define CHIBIOS_UART_SPI_PEREPHERIAL  &UARTD3
 
 
 #if defined(GLCD_DEVICE_AVR8)
@@ -74,9 +76,21 @@
 	#define PROGMEM
 	
 #elif defined(GLCD_DEVICE_STM32F4XX_CHIBIOS)
+	//Allows you to use a UART peripheral as a SPI bus (STM32 can do this).
+
+#if GLCD_USE_SPI_UART
+    #ifndef CHIBIOS_UART_SPI_PEREPHERIAL
+        #error "You must define CHIBIOS_UART_SPI_PEREPHERIAL somewhere, E.G. #define CHIBIOS_UART_SPI_PEREPHERIAL &UARTD3"
+    #endif
+#else
     #ifndef CHIBIOS_SPI_PEREPHERIAL
         #error "You must define CHIBIOS_SPI_PEREPHERIAL somewhere, E.G. #define CHIBIOS_SPI_PEREPHERIAL &SPID1"
     #endif
+#endif
+
+
+
+
 
     #define delay_ms(t)                   chThdSleepMilliseconds(t)
     #include "devices/STM32F4_ChibiOS.h"
@@ -102,8 +116,8 @@
 	 */
     #include "controllers/sharp_LS013B7DH03.h"
     #define   USE_SPI_MULTIBYTE
-    #define BLACK 0
-    #define WHITE 1
+    #define   BLACK 0
+    #define   WHITE 1
 
 
 

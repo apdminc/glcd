@@ -56,6 +56,7 @@ void glcd_bar_graph_horizontal_no_border(uint8_t x, uint8_t y, uint8_t width, ui
 void glcd_bar_graph_vertical(uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t val)
 {
 	glcd_draw_rect(x, y, width, height, GRAPH_COLOR_LINE);
+	glcd_fill_rect(x+1, y+1, width-2, y+1+glcd_map(0,height-3,255-val), GRAPH_COLOR_BACKGROUND);
 	glcd_fill_rect(x+1, y+1+glcd_map(0,height-2,255-val), width-2, height-2-glcd_map(0,height-2,255-val), GRAPH_COLOR_LINE);
 }
 
@@ -121,7 +122,7 @@ void glcd_scrolling_line_graph(uint8_t x, uint8_t y, uint8_t width, uint8_t heig
     }
 
     /* Draw new bar - both black and white portions*/
-    glcd_draw_line(x+width-2,y+height-3,x+width-2,y+1,GRAPH_COLOR_BACKGROUND);
+    glcd_draw_line(x+width-2,y+height-2,x+width-2,y+1,GRAPH_COLOR_BACKGROUND);
     //glcd_draw_line(x+width-2,y+height-2,x+width-2,y+height-2-val,GRAPH_COLOR_LINE);
     glcd_set_pixel(x+width-2, y+height-2-val, GRAPH_COLOR_LINE);
 
