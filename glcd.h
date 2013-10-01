@@ -78,6 +78,8 @@
 #elif defined(GLCD_DEVICE_STM32F4XX_CHIBIOS)
 	//Allows you to use a UART peripheral as a SPI bus (STM32 can do this).
 
+    #define GLCD_USE_CORTEX_M3_INSTRUCTIONS TRUE
+
 #if GLCD_USE_SPI_UART
     #ifndef CHIBIOS_UART_SPI_PEREPHERIAL
         #error "You must define CHIBIOS_UART_SPI_PEREPHERIAL somewhere, E.G. #define CHIBIOS_UART_SPI_PEREPHERIAL &UARTD3"

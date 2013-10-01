@@ -32,6 +32,36 @@ void glcd_set_x_address(uint8_t x)
 {
 }
 
+
+#ifdef GLCD_USE_CORTEX_M3_INSTRUCTIONS
+/**
+ * @brief  Reverse bit order of value
+ *
+ * @param  uint32_t value to reverse
+ * @return uint32_t reversed value
+ *
+ * Reverse bit order of value
+ */
+
+#if 0
+uint32_t reverse_significant_bits32(uint32_t value)
+{
+  __ASM("rbit r0, r0");
+  __ASM("bx lr");
+}
+#endif
+
+uint8_t reverse_significant_bits(uint8_t value)
+{
+  //__ASM("rbit r0, r0");
+  //__ASM("bx lr");
+
+  //single cycle instruction to reverse the order of the bits
+  asm volatile ("rbit     %1, %0  " : : "r" (value), "r" (value));
+  return((value >> 24));
+}
+
+#else
 /*
  * Use for MSB->LSB or LSB->MSB conversions of bytes.
  */
@@ -47,23 +77,7 @@ static uint8_t reverse_significant_bits(uint8_t v) {
   }
   return(ret);
 }
-
-/**
- * @brief  Reverse bit order of value
- *
- * @param  uint32_t value to reverse
- * @return uint32_t reversed value
- *
- * Reverse bit order of value
- */
-/*
-uint32_t __RBIT(uint32_t value)
-{
-  //FIXME this is a THUMB2 instruction suitable for single-cycle byte reversal. Use It!!!
-  __ASM("rbit r0, r0");
-  __ASM("bx lr");
-}
-*/
+#endif
 
 static uint8_t to_lsb(uint8_t v)
 {
