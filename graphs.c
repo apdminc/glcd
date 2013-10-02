@@ -97,21 +97,23 @@ void glcd_scrolling_bar_graph(uint8_t x, uint8_t y, uint8_t width, uint8_t heigh
 	//glcd_write();
 }
 
-void glcd_scrolling_line_graph(uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t val)
+void glcd_scrolling_line_graph(uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t left_step_count, uint8_t val, uint8_t x_position_subtractor)
 {
-    uint8_t nx, ny;
-    uint8_t color;
+    /* Scroll inner contents left by left_step_count pixels width */
+    if( left_step_count > 0 ) {
+      /* Draw border of graph */
+      glcd_draw_rect(x,y,width,height,GRAPH_COLOR_LINE);
 
-    /* Draw border of graph */
-    glcd_draw_rect(x,y,width,height,GRAPH_COLOR_LINE);
+      for (uint8_t ny = 1; ny <= (height-2); ny++) {
+          /* Redraw each horizontal line */
+          for (uint8_t nx =  1; nx <= (width-2-left_step_count-1); nx += 1) {
+              uint8_t color = glcd_get_pixel(x+nx+left_step_count-1, y+ny);
+              glcd_set_pixel(x+nx, y+ny, color);
+          }
+      }
 
-    /* Scroll inner contents left by one pixel width */
-    for (ny = 1; ny <= (height-2); ny++) {
-        /* Redraw each horizontal line */
-        for (nx = 1; nx <= (width-2); nx += 1) {
-            color = glcd_get_pixel(x+nx+1,y+ny);
-            glcd_set_pixel(x+nx,y+ny,color);
-        }
+      /* Draw new bar - both black and white portions*/
+      glcd_draw_line(x+width-2,y+height-2,x+width-2,y+1,GRAPH_COLOR_BACKGROUND);
     }
 
     val = val * (height-3) / 255;
@@ -121,10 +123,10 @@ void glcd_scrolling_line_graph(uint8_t x, uint8_t y, uint8_t width, uint8_t heig
         val = height - 3;
     }
 
-    /* Draw new bar - both black and white portions*/
-    glcd_draw_line(x+width-2,y+height-2,x+width-2,y+1,GRAPH_COLOR_BACKGROUND);
-    //glcd_draw_line(x+width-2,y+height-2,x+width-2,y+height-2-val,GRAPH_COLOR_LINE);
-    glcd_set_pixel(x+width-2, y+height-2-val, GRAPH_COLOR_LINE);
+    //glcd_draw_line(x+width-2, y+height-2,x+width-2,y+height-2-val,GRAPH_COLOR_BACKGROUND);
+    const uint8_t x_pos = x + width - 2 - x_position_subtractor;
+    glcd_draw_line(x_pos, y+height-1, x_pos, y+1, GRAPH_COLOR_BACKGROUND);//black out the background
+    glcd_set_pixel(x_pos, y+height-2-val, GRAPH_COLOR_LINE);//place a pixel on top of what you blacked out
 
 
     /* Write to display */
