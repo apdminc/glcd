@@ -136,6 +136,9 @@
 
 #define swap(a, b) { uint8_t t = a; a = b; b = t; }
 
+
+
+
 #include <stdint.h>
 #include "glcd_devices.h"
 #include "glcd_controllers.h"
@@ -303,6 +306,12 @@ void glcd_scroll(int8_t x, int8_t y);
  * \see Tiny Text
  */
 void glcd_scroll_line(void);
+
+/**
+ * FIXME document this
+ */
+uint8_t glcd_reverse_significant_bits(uint32_t value);
+
 
 /** @}*/
 

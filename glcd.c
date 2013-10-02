@@ -166,3 +166,38 @@ void glcd_scroll_line(void)
 	glcd_update_bbox(0,0,GLCD_LCD_WIDTH - 1,GLCD_LCD_HEIGHT - 1);
 }
 
+
+#ifdef GLCD_USE_CORTEX_M3_INSTRUCTIONS
+/*
+ * 8-bit MSB->LSB or LSB->MSB conversions of bytes.
+ */
+inline __attribute__((always_inline))
+uint8_t glcd_reverse_significant_bits(uint32_t value)
+{
+  //single cycle instruction to reverse the order of the bits
+  uint32_t d;
+  asm ("rbit  %[Rd], %[Rm]        \r\n"
+       "lsrs  %[Rd], %[Rd], #24   \r\n"
+       : [Rd] "=r" (d)
+       : [Rm] "r" (value));
+  return(d & 0xFF);
+}
+
+#else
+/*
+ * 8-bit MSB->LSB or LSB->MSB conversions of bytes.
+ */
+uint8_t glcd_reverse_significant_bits(uint32_t v) {
+  uint8_t ret = (v & 0x01);
+
+  for(int i = 1; i < 8; i++ ) {
+    ret <<= 1;
+    v >>= 1;
+    if( v & 0x01 ) {
+      ret |= 0x01;
+    }
+  }
+  return(ret);
+}
+#endif
+

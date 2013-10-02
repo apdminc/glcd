@@ -4,6 +4,8 @@
 
 #include "string.h"
 
+
+
 void glcd_command(uint8_t c)
 {
 }
@@ -33,51 +35,6 @@ void glcd_set_x_address(uint8_t x)
 }
 
 
-#ifdef GLCD_USE_CORTEX_M3_INSTRUCTIONS
-/**
- * @brief  Reverse bit order of value
- *
- * @param  uint32_t value to reverse
- * @return uint32_t reversed value
- *
- * Reverse bit order of value
- */
-
-#if 0
-uint32_t reverse_significant_bits32(uint32_t value)
-{
-  __ASM("rbit r0, r0");
-  __ASM("bx lr");
-}
-#endif
-
-uint8_t reverse_significant_bits(uint8_t value)
-{
-  //__ASM("rbit r0, r0");
-  //__ASM("bx lr");
-
-  //single cycle instruction to reverse the order of the bits
-  asm volatile ("rbit     %1, %0  " : : "r" (value), "r" (value));
-  return((value >> 24));
-}
-
-#else
-/*
- * Use for MSB->LSB or LSB->MSB conversions of bytes.
- */
-static uint8_t reverse_significant_bits(uint8_t v) {
-  uint8_t ret = (v & 0x01);
-
-  for(int i = 1; i < 8; i++ ) {
-    ret <<= 1;
-    v >>= 1;
-    if( v & 0x01 ) {
-      ret |= 0x01;
-    }
-  }
-  return(ret);
-}
-#endif
 
 static uint8_t to_lsb(uint8_t v)
 {
@@ -90,7 +47,7 @@ static uint8_t to_lsb(uint8_t v)
   /*
    * This assumes that the SPI peripheral is in MSB mode.
    */
-  return(reverse_significant_bits(v));
+  return(glcd_reverse_significant_bits(v));
 #endif
 }
 
@@ -135,7 +92,7 @@ void glcd_write_bounded(const int ymin, const int ymax)
 #if 1
     //Rotated -90 degrees
     for(int i = (GLCD_LCD_HEIGHT/8) - 1; i >= 0; i-- ) {
-      cmd_buff[2 + (MLCD_BYTES_LINE - 1 - i)] = reverse_significant_bits(glcd_buffer[y_row + (i * GLCD_LCD_WIDTH)]);
+      cmd_buff[2 + (MLCD_BYTES_LINE - 1 - i)] = glcd_reverse_significant_bits(glcd_buffer[y_row + (i * GLCD_LCD_WIDTH)]);
       line_number = MLCD_YRES - 1 - y_row;
     }
 #elif 1
@@ -163,8 +120,8 @@ void glcd_write_bounded(const int ymin, const int ymax)
     for(int i = 0; i < ((GLCD_LCD_HEIGHT/8) / 2); i++ ) {
       const int right_index = 2 + ((GLCD_LCD_HEIGHT/8) - 1 - i);
       const int left_index = 2 + i;
-      uint8_t lhs = reverse_significant_bits(cmd_buff[right_index]);
-      uint8_t rhs = reverse_significant_bits(cmd_buff[left_index]);
+      uint8_t lhs = glcd_reverse_significant_bits(cmd_buff[right_index]);
+      uint8_t rhs = glcd_reverse_significant_bits(cmd_buff[left_index]);
       cmd_buff[left_index] = lhs;
       cmd_buff[right_index] = rhs;
     }
