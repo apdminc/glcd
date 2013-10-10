@@ -61,19 +61,15 @@ static void glcd_rotate_pixels(uint8_t *x, uint8_t *y) {
     case GLCD_SCREEN_ROTATION_0_DEGREES:
       break;
     case GLCD_SCREEN_ROTATION_90_DEGREES:
-      /*
-       * 10,10 -> 10,(height-10)
-       * 10,15 -> 15,(height-10)
-       */
       *x = y_orig;
-      *y = GLCD_LCD_HEIGHT - x_orig;
+      *y = GLCD_LCD_HEIGHT - 1 - x_orig;
       break;
     case GLCD_SCREEN_ROTATION_180_DEGREES:
-      *x = GLCD_LCD_WIDTH - x_orig;
-      *y = GLCD_LCD_HEIGHT - y_orig;
+      *x = GLCD_LCD_WIDTH - 1 - x_orig;
+      *y = GLCD_LCD_HEIGHT - 1 - y_orig;
       break;
     case GLCD_SCREEN_ROTATION_270_DEGREES:
-      *x = GLCD_LCD_WIDTH - y_orig;
+      *x = GLCD_LCD_WIDTH - 1 - y_orig;
       *y = x_orig;
       break;
   }
