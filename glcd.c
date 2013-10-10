@@ -64,6 +64,13 @@ uint8_t *glcd_buffer_selected = NULL;
  */
 glcd_BoundingBox_t *glcd_bbox_selected = NULL;
 
+
+/**
+ * The current screen orientation
+ */
+glcd_screen_rotation_mode_t glcd_screen_rotation = GLCD_SCREEN_ROTATION_0_DEGREES;
+
+
 /** @} */
 
 void glcd_update_bbox(uint8_t xmin, uint8_t ymin, uint8_t xmax, uint8_t ymax)

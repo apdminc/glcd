@@ -43,7 +43,6 @@
 #include "glcd.h"
 
 
-glcd_screen_rotation_mode_t glcd_screen_rotation = GLCD_SCREEN_ROTATION_0_DEGREES;
 
 void glcd_set_screen_rotation(const glcd_screen_rotation_mode_t mode) {
   glcd_screen_rotation = mode;

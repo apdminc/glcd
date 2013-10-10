@@ -239,6 +239,7 @@ extern uint8_t glcd_buffer[GLCD_LCD_WIDTH * GLCD_LCD_HEIGHT / 8];
 extern glcd_BoundingBox_t glcd_bbox;
 extern uint8_t *glcd_buffer_selected;
 extern glcd_BoundingBox_t *glcd_bbox_selected;
+extern glcd_screen_rotation_mode_t glcd_screen_rotation;
 
 /** \name Base Functions 
  *  @{
