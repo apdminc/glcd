@@ -65,6 +65,13 @@ uint8_t glcd_get_pixel(uint8_t x, uint8_t y);
 void glcd_invert_pixel(uint8_t x, uint8_t y);
 
 /**
+ * CPU efficient method of setting the entire screen to a specified color.
+ *
+ * \param color The color to set the screen to
+ */
+void glcd_set_screen_buffer(uint8_t color);
+
+/**
  * Draw line
  * \param x0 Start x-coordinate
  * \param y0 Start y-coordinate

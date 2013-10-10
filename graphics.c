@@ -74,6 +74,14 @@ static void glcd_rotate_pixels(uint8_t *x, uint8_t *y) {
   }
 }
 
+void glcd_set_screen_buffer(uint8_t color) {
+  if( color ) {
+    memset(glcd_buffer, 0xFF, sizeof(glcd_buffer));
+  } else {
+    memset(glcd_buffer, 0x00, sizeof(glcd_buffer));
+  }
+  glcd_update_bbox(0,0,(GLCD_LCD_WIDTH-1),(GLCD_LCD_HEIGHT-1));
+}
 
 /* Based on PCD8544 library by Limor Fried */
 void glcd_set_pixel(uint8_t x, uint8_t y, uint8_t color) {
