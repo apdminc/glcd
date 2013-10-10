@@ -42,8 +42,47 @@
 #include <string.h>
 #include "glcd.h"
 
+
+glcd_screen_rotation_mode_t glcd_screen_rotation = GLCD_SCREEN_ROTATION_0_DEGREES;
+
+void glcd_set_screen_rotation(const glcd_screen_rotation_mode_t mode) {
+  glcd_screen_rotation = mode;
+}
+
+glcd_screen_rotation_mode_t glcd_get_screen_rotation(void) {
+  return(glcd_screen_rotation);
+}
+
+static void glcd_rotate_pixels(uint8_t *x, uint8_t *y) {
+  const uint8_t x_orig = *x;
+  const uint8_t y_orig = *y;
+
+  switch(glcd_screen_rotation) {
+    case GLCD_SCREEN_ROTATION_0_DEGREES:
+      break;
+    case GLCD_SCREEN_ROTATION_90_DEGREES:
+      /*
+       * 10,10 -> 10,(height-10)
+       * 10,15 -> 15,(height-10)
+       */
+      *x = y_orig;
+      *y = GLCD_LCD_HEIGHT - x_orig;
+      break;
+    case GLCD_SCREEN_ROTATION_180_DEGREES:
+      *x = GLCD_LCD_WIDTH - x_orig;
+      *y = GLCD_LCD_HEIGHT - y_orig;
+      break;
+    case GLCD_SCREEN_ROTATION_270_DEGREES:
+      *x = GLCD_LCD_WIDTH - y_orig;
+      *y = x_orig;
+      break;
+  }
+}
+
+
 /* Based on PCD8544 library by Limor Fried */
 void glcd_set_pixel(uint8_t x, uint8_t y, uint8_t color) {
+    glcd_rotate_pixels(&x, &y);
 	if (x > (GLCD_LCD_WIDTH-1) || y > (GLCD_LCD_HEIGHT-1)) {
 		/* don't do anything if x/y is outside bounds of display size */
 		return;
@@ -62,6 +101,7 @@ void glcd_set_pixel(uint8_t x, uint8_t y, uint8_t color) {
 
 /* Based on PCD8544 library by Limor Fried */
 uint8_t glcd_get_pixel(uint8_t x, uint8_t y) {
+    glcd_rotate_pixels(&x, &y);
 	if ((x >= GLCD_LCD_WIDTH) || (y >= GLCD_LCD_HEIGHT)) {
 		return 0;
 	}
@@ -74,6 +114,7 @@ uint8_t glcd_get_pixel(uint8_t x, uint8_t y) {
 }
 
 void glcd_invert_pixel(uint8_t x, uint8_t y) {
+    glcd_rotate_pixels(&x, &y);
 	if ((x >= GLCD_LCD_WIDTH) || (y >= GLCD_LCD_HEIGHT)) {
 		return;
 	}

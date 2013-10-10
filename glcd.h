@@ -227,6 +227,13 @@ typedef struct {
 	uint8_t y_max;
 } glcd_BoundingBox_t;
 
+typedef enum {
+  GLCD_SCREEN_ROTATION_0_DEGREES = 0,
+  GLCD_SCREEN_ROTATION_90_DEGREES,
+  GLCD_SCREEN_ROTATION_180_DEGREES,
+  GLCD_SCREEN_ROTATION_270_DEGREES,
+} glcd_screen_rotation_mode_t;
+
 /* Global variables used for GLCD library */
 extern uint8_t glcd_buffer[GLCD_LCD_WIDTH * GLCD_LCD_HEIGHT / 8];
 extern glcd_BoundingBox_t glcd_bbox;
@@ -307,6 +314,9 @@ void glcd_scroll(int8_t x, int8_t y);
  */
 void glcd_scroll_line(void);
 
+void glcd_set_screen_rotation(const glcd_screen_rotation_mode_t mode);
+glcd_screen_rotation_mode_t glcd_get_screen_rotation(void);
+
 /**
  * FIXME document this
  */
@@ -316,6 +326,8 @@ uint8_t glcd_reverse_significant_bits(uint32_t value);
 /** @}*/
 
 enum font_table_type { STANG, MIKRO };
+
+
 
 typedef struct {
 	const char *font_table;
