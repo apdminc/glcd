@@ -34,9 +34,6 @@
 
 #include "glcd.h"
 
-extern uint8_t *glcd_buffer_selected;
-extern glcd_BoundingBox_t *glcd_bbox_selected;
-
 glcd_FontConfig_t font_current;
 
 #if defined(GLCD_DEVICE_AVR8)
