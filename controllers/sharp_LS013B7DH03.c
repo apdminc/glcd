@@ -82,50 +82,15 @@ void glcd_write_bounded(const int ymin, const int ymax)
   }
 
 
-
   for(; y_row <= y_row_max && y_row >= 0 && y_row < MLCD_YRES; y_row++ ) {
     static uint8_t cmd_buff[1 + 1 + MLCD_BYTES_LINE + 2];
     memset(cmd_buff, 0, sizeof(cmd_buff));
     cmd_buff[0] = MLCD_WR_MSB;
     uint8_t line_number = y_row;
 
-#if 1
-    //Rotated -90 degrees
-    for(int i = (GLCD_LCD_HEIGHT/8) - 1; i >= 0; i-- ) {
-      cmd_buff[2 + (MLCD_BYTES_LINE - 1 - i)] = glcd_reverse_significant_bits(glcd_buffer[y_row + (i * GLCD_LCD_WIDTH)]);
-      line_number = MLCD_YRES - 1 - y_row;
-    }
-#elif 1
-    //Rotated 90 degrees
     for(int i = 0; i < (GLCD_LCD_HEIGHT/8); i++ ) {
-      cmd_buff[2 + i] = glcd_buffer[y_row + (i * GLCD_LCD_WIDTH)];
+      cmd_buff[2 + ((GLCD_LCD_HEIGHT/8) - 1 - i)] = glcd_reverse_significant_bits(glcd_buffer[y_row + (i * GLCD_LCD_WIDTH)]);
     }
-#else
-    //No rotation
-    for(int x_column = 0; x_column < MLCD_XRES; x_column++ ) {
-        const uint8_t byte_offset = x_column / 8;
-        if( byte_offset > MLCD_BYTES_LINE ) {
-          //defensive programming, some bad math going on somewhere... This should not happen
-          break;
-        }
-        const uint8_t bit_shift = (x_column%8);
-        if( glcd_get_pixel(x_column, y_row) ) {
-          cmd_buff[2 + byte_offset] |= (1<<bit_shift);
-        }
-    }
-#endif
-
-#if 1
-    //apply mirroring
-    for(int i = 0; i < ((GLCD_LCD_HEIGHT/8) / 2); i++ ) {
-      const int right_index = 2 + ((GLCD_LCD_HEIGHT/8) - 1 - i);
-      const int left_index = 2 + i;
-      uint8_t lhs = glcd_reverse_significant_bits(cmd_buff[right_index]);
-      uint8_t rhs = glcd_reverse_significant_bits(cmd_buff[left_index]);
-      cmd_buff[left_index] = lhs;
-      cmd_buff[right_index] = rhs;
-    }
-#endif
 
     cmd_buff[1] = to_lsb(line_number + 1);//lines are 1-based on the LCD itself
 
