@@ -5,7 +5,7 @@
 void glcd_init(void)
 {
 #if defined(GLCD_CONTROLLER_SHARP_LS013B7DH03)
-    //Note: SPI pins and controller should be initialized by chibios, using a combonation of main() and the board.h file.
+    //Note: SPI pins and controller should be initialized by chibios, using a combination of main() and the board.h file.
 #else
     #error "Controller not supported."
 #endif
