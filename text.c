@@ -133,7 +133,7 @@ uint8_t glcd_draw_char_xy(uint8_t x, uint8_t y, char c)
 		return var_width;	
 		
 	} else {
-		// don't recognise the font table
+		// don't recognize the font table
 		return 0;
 	}
 
