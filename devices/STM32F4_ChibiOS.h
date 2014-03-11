@@ -3,6 +3,7 @@
 
 #include "ch.h"
 #include "hal.h"
+#include "spi_tx_only.h"
 #include "bus_locking.h"
 
 #if !defined(GLCD_USE_PARALLEL)
@@ -18,6 +19,8 @@
 #  else
     //extern int bus_lock_spi_mtx(const SPIDriver *driver_address);
     //extern int bus_unlock_spi_mtx(const SPIDriver *driver_address);
+    //#define GLCD_SELECT()     bus_unlock_spi_mtx(CHIBIOS_SPI_PEREPHERIAL); spiSelect(CHIBIOS_SPI_PEREPHERIAL)
+    //#define GLCD_DESELECT()   bus_lock_spi_mtx(CHIBIOS_SPI_PEREPHERIAL); spiUnselect(CHIBIOS_SPI_PEREPHERIAL)
     #define GLCD_SELECT()     bus_unlock_spi_mtx(CHIBIOS_SPI_PEREPHERIAL); spiSelect(CHIBIOS_SPI_PEREPHERIAL)
     #define GLCD_DESELECT()   bus_lock_spi_mtx(CHIBIOS_SPI_PEREPHERIAL); spiUnselect(CHIBIOS_SPI_PEREPHERIAL)
 #  endif

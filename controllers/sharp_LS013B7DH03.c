@@ -97,6 +97,10 @@ void glcd_write_bounded(const int ymin, const int ymax)
     GLCD_DESELECT();
     glcd_spi_write_multibyte(sizeof(cmd_buff), cmd_buff);
     GLCD_SELECT();
+    for(int i = 0; i < 500; i++ ) {
+      //This loop need to burn about 6 micro seconds to satisfy the sharp LCD Minimum SCS low time
+      __NOP();
+    }
   }
 
   /* Display updated, we can reset the bounding box */
