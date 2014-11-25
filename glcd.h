@@ -158,10 +158,11 @@
 #ifndef WHITE
   #define WHITE 0
 #endif
-#define FONT_COLOR_TEXT           WHITE
-#define FONT_COLOR_BACKGROUND     BLACK
-#define GRAPH_COLOR_LINE           WHITE
-#define GRAPH_COLOR_BACKGROUND     BLACK
+#define FONT_COLOR_TEXT           BLACK
+#define FONT_COLOR_BACKGROUND     WHITE
+
+#define GRAPH_COLOR_LINE           BLACK
+#define GRAPH_COLOR_BACKGROUND     WHITE
 /**@}*/
 
 /**
