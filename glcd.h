@@ -158,11 +158,17 @@
 #ifndef WHITE
   #define WHITE 0
 #endif
-#define FONT_COLOR_TEXT           BLACK
-#define FONT_COLOR_BACKGROUND     WHITE
 
-#define GRAPH_COLOR_LINE           BLACK
-#define GRAPH_COLOR_BACKGROUND     WHITE
+
+
+
+
+//#define FONT_COLOR_TEXT           WHITE
+//#define FONT_COLOR_BACKGROUND     BLACK
+
+//#define GRAPH_COLOR_LINE           WHITE
+//#define GRAPH_COLOR_BACKGROUND     BLACK
+
 /**@}*/
 
 /**
@@ -245,6 +251,10 @@ extern glcd_screen_rotation_mode_t glcd_screen_rotation;
 /** \name Base Functions 
  *  @{
  */
+
+uint8_t glcd_get_foreground_color(void);
+uint8_t glcd_get_backgound_color(void);
+void glcd_set_foreground_color(uint8_t color);
 
 /**
  * Update bounding box.

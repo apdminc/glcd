@@ -34,15 +34,25 @@
 
 #include "glcd.h"
 
+uint8_t graph_color_line = WHITE;
+uint8_t graph_color_background = BLACK;
+
+
+
 static uint8_t glcd_map(uint8_t x1, uint8_t x2, uint8_t x);
+
+void glcd_graph_set_foreground_color(uint8_t color) {
+  graph_color_line = color;
+  graph_color_background = (color == BLACK ? WHITE : BLACK);
+}
 
 void glcd_bar_graph_horizontal(uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t val)
 {
 	if (height < 3) {
 		return;
 	}
-	glcd_draw_rect(x, y, width, height, GRAPH_COLOR_LINE);
-	glcd_fill_rect(x+1, y+1, glcd_map(0,width-2,val), height-2 , GRAPH_COLOR_LINE);
+	glcd_draw_rect(x, y, width, height, graph_color_line);
+	glcd_fill_rect(x+1, y+1, glcd_map(0,width-2,val), height-2 , graph_color_line);
 }
 
 void glcd_bar_graph_horizontal_no_border(uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t val)
@@ -50,19 +60,19 @@ void glcd_bar_graph_horizontal_no_border(uint8_t x, uint8_t y, uint8_t width, ui
 	if (height < 3) {
 		return;
 	}	
-	glcd_fill_rect(x, y, glcd_map(0,width,val), height , GRAPH_COLOR_LINE);
+	glcd_fill_rect(x, y, glcd_map(0,width,val), height , graph_color_line);
 }
 
 void glcd_bar_graph_vertical(uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t val)
 {
-	glcd_draw_rect(x, y, width, height, GRAPH_COLOR_LINE);
-	glcd_fill_rect(x+1, y+1, width-2, y+1+glcd_map(0,height-3,255-val), GRAPH_COLOR_BACKGROUND);
-	glcd_fill_rect(x+1, y+1+glcd_map(0,height-2,255-val), width-2, height-2-glcd_map(0,height-2,255-val), GRAPH_COLOR_LINE);
+	glcd_draw_rect(x, y, width, height, graph_color_line);
+	glcd_fill_rect(x+1, y+1, width-2, y+1+glcd_map(0,height-3,255-val), graph_color_background);
+	glcd_fill_rect(x+1, y+1+glcd_map(0,height-2,255-val), width-2, height-2-glcd_map(0,height-2,255-val), graph_color_line);
 }
 
 void glcd_bar_graph_vertical_no_border(uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t val)
 {
-	glcd_fill_rect(x, y+glcd_map(0,height-2,255-val), width, height-2-glcd_map(0,height-2,255-val), GRAPH_COLOR_LINE);
+	glcd_fill_rect(x, y+glcd_map(0,height-2,255-val), width, height-2-glcd_map(0,height-2,255-val), graph_color_line);
 }
 
 void glcd_scrolling_bar_graph(uint8_t x, uint8_t y, uint8_t width, uint8_t height, uint8_t val)
@@ -71,7 +81,7 @@ void glcd_scrolling_bar_graph(uint8_t x, uint8_t y, uint8_t width, uint8_t heigh
 	uint8_t color;
 	
 	/* Draw border of graph */
-	glcd_draw_rect(x,y,width,height,GRAPH_COLOR_LINE);
+	glcd_draw_rect(x,y,width,height,graph_color_line);
 	
 	/* Scroll inner contents left by one pixel width */
 	for (ny = 1; ny <= (height-2); ny++) {
@@ -90,8 +100,8 @@ void glcd_scrolling_bar_graph(uint8_t x, uint8_t y, uint8_t width, uint8_t heigh
 	}
 	
 	/* Draw new bar - both black and white portions*/
-	glcd_draw_line(x+width-2,y+height-2,x+width-2,y+height-2-val,GRAPH_COLOR_LINE);
-	glcd_draw_line(x+width-2,y+height-3-val,x+width-2,y+1,GRAPH_COLOR_BACKGROUND);
+	glcd_draw_line(x+width-2,y+height-2,x+width-2,y+height-2-val,graph_color_line);
+	glcd_draw_line(x+width-2,y+height-3-val,x+width-2,y+1,graph_color_background);
 	
 	/* Write to display */
 	//glcd_write();
@@ -102,7 +112,7 @@ void glcd_scrolling_line_graph(uint8_t x, uint8_t y, uint8_t width, uint8_t heig
     /* Scroll inner contents left by left_step_count pixels width */
     if( left_step_count > 0 ) {
       /* Draw border of graph */
-      glcd_draw_rect(x,y,width,height,GRAPH_COLOR_LINE);
+      glcd_draw_rect(x,y,width,height,graph_color_line);
 
       for (uint8_t ny = 1; ny <= (height-2); ny++) {
           /* Redraw each horizontal line */
@@ -113,7 +123,7 @@ void glcd_scrolling_line_graph(uint8_t x, uint8_t y, uint8_t width, uint8_t heig
       }
 
       /* Draw new bar - both black and white portions*/
-      glcd_draw_line(x+width-2,y+height-2,x+width-2,y+1,GRAPH_COLOR_BACKGROUND);
+      glcd_draw_line(x+width-2,y+height-2,x+width-2,y+1,graph_color_background);
     }
 
     val = val * (height-3) / 255;
@@ -123,10 +133,10 @@ void glcd_scrolling_line_graph(uint8_t x, uint8_t y, uint8_t width, uint8_t heig
         val = height - 3;
     }
 
-    //glcd_draw_line(x+width-2, y+height-2,x+width-2,y+height-2-val,GRAPH_COLOR_BACKGROUND);
+    //glcd_draw_line(x+width-2, y+height-2,x+width-2,y+height-2-val,graph_color_background);
     const uint8_t x_pos = x + width - 2 - x_position_subtractor;
-    glcd_draw_line(x_pos, y+height-1, x_pos, y+1, GRAPH_COLOR_BACKGROUND);//black out the background
-    glcd_set_pixel(x_pos, y+height-2-val, GRAPH_COLOR_LINE);//place a pixel on top of what you blacked out
+    glcd_draw_line(x_pos, y+height-1, x_pos, y+1, graph_color_background);//black out the background
+    glcd_set_pixel(x_pos, y+height-2-val, graph_color_line);//place a pixel on top of what you blacked out
 
 
     /* Write to display */

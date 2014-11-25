@@ -35,6 +35,14 @@
 #include "glcd.h"
 
 glcd_FontConfig_t font_current;
+uint8_t font_color_text = WHITE;
+uint8_t font_color_background = BLACK;
+
+
+void glcd_text_set_foreground_color(uint8_t color) {
+  font_color_text = color;
+  font_color_background = (color == BLACK ? WHITE : BLACK);
+}
 
 #if defined(GLCD_DEVICE_AVR8)
 void glcd_set_font(PGM_P font_table, uint8_t width, uint8_t height, char start_char, char end_char)
@@ -73,9 +81,9 @@ uint8_t glcd_draw_char_xy(uint8_t x, uint8_t y, char c)
 					return 0;
 				}					
 				if (dat & (1<<j)) {
-					glcd_set_pixel(x+i,y+j,FONT_COLOR_TEXT);
+					glcd_set_pixel(x+i,y+j,font_color_text);
 				} else {
-					glcd_set_pixel(x+i,y+j,FONT_COLOR_BACKGROUND);
+					glcd_set_pixel(x+i,y+j,font_color_background);
 				}
 			}
 		}
@@ -123,9 +131,9 @@ uint8_t glcd_draw_char_xy(uint8_t x, uint8_t y, char c)
 					}					
 					
 					if (dat & (1<<bit)) {
-						glcd_set_pixel(x+i,y+j*8+bit,FONT_COLOR_TEXT);
+						glcd_set_pixel(x+i,y+j*8+bit,font_color_text);
 					} else {
-						glcd_set_pixel(x+i,y+j*8+bit,FONT_COLOR_BACKGROUND);
+						glcd_set_pixel(x+i,y+j*8+bit,font_color_background);
 					}
 				}									
 			}				

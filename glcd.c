@@ -70,6 +70,24 @@ glcd_BoundingBox_t *glcd_bbox_selected = NULL;
  */
 glcd_screen_rotation_mode_t glcd_screen_rotation = GLCD_SCREEN_ROTATION_0_DEGREES;
 
+uint8_t current_foreground_color = WHITE;
+uint8_t current_background_color = BLACK;
+
+uint8_t glcd_get_foreground_color(void) {
+  return(current_foreground_color);
+}
+
+uint8_t glcd_get_backgound_color(void) {
+  return(current_background_color);
+}
+
+void glcd_set_foreground_color(uint8_t color) {
+  glcd_graph_set_foreground_color(color);
+  glcd_text_set_foreground_color(color);
+
+  current_foreground_color = color;
+  current_background_color = (color == BLACK ? WHITE : BLACK);
+}
 
 /** @} */
 

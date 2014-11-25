@@ -40,6 +40,9 @@
  *  @{
  */
 
+
+void glcd_text_set_foreground_color(uint8_t color);
+
 /** \addtogroup StandardText Standard Text
  *  Functions relating to using text fonts of all sizes.
  *  @{

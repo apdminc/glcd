@@ -40,6 +40,8 @@
  *  @{
  */
 
+void glcd_graph_set_foreground_color(uint8_t color);
+
 /** Draw horizontal bar graph with 1 px wide border.
  *  The bar graph draws from left to right as val increases.
  *  \param x x location for top-left of border
