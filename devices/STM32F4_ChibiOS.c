@@ -27,7 +27,9 @@ void glcd_spi_write_multibyte(const uint16_t length, const uint8_t *source_buffe
   //spiStart(CHIBIOS_SPI_PEREPHERIAL, &lcd_spi_cfg);
   //spiSend(CHIBIOS_SPI_PEREPHERIAL, length, source_buffer);//chibios function call
 
-  spiTxOnlyStart(CHIBIOS_SPI_PEREPHERIAL, &lcd_spi_cfg);
+  if( (CHIBIOS_SPI_PEREPHERIAL)->state != SPI_READY ) {
+    spiTxOnlyStart(CHIBIOS_SPI_PEREPHERIAL, &lcd_spi_cfg);
+  }
   spiTxOnlySend(CHIBIOS_SPI_PEREPHERIAL, length, source_buffer);//chibios function call
 #endif
 }
