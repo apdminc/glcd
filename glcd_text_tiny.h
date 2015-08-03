@@ -60,6 +60,11 @@ void glcd_tiny_set_font(PGM_P font_table, uint8_t width, uint8_t height, char st
 void glcd_tiny_set_font(const char *font_table, uint8_t width, uint8_t height, char start_char, char end_char);
 #endif
 
+/**
+ * FIXME document this
+ */
+uint8_t glcd_get_current_font_height(void);
+
 /** Write character to LCD in tiny 5x7 font.
  *  \param x    column position to start 
  *  \param line line number to be written (each line is 8 pixels high)

@@ -48,6 +48,10 @@ void glcd_tiny_set_font(const char * font_table, uint8_t width, uint8_t height, 
 	font_current.table_type = STANG;
 }
 
+uint8_t glcd_get_current_font_height(void) {
+  return(font_current.height);
+}
+
 void glcd_tiny_draw_char(uint8_t x, uint8_t line, char c)
 {
 	uint8_t i;
