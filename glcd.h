@@ -253,7 +253,7 @@ extern glcd_screen_rotation_mode_t glcd_screen_rotation;
  */
 
 uint8_t glcd_get_foreground_color(void);
-uint8_t glcd_get_backgound_color(void);
+uint8_t glcd_get_background_color(void);
 void glcd_set_foreground_color(uint8_t color);
 
 /**

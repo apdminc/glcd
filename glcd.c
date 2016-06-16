@@ -77,7 +77,7 @@ uint8_t glcd_get_foreground_color(void) {
   return(current_foreground_color);
 }
 
-uint8_t glcd_get_backgound_color(void) {
+uint8_t glcd_get_background_color(void) {
   return(current_background_color);
 }
 
