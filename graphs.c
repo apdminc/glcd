@@ -135,7 +135,7 @@ void glcd_scrolling_line_graph(uint8_t x, uint8_t y, uint8_t width, uint8_t heig
 
     //glcd_draw_line(x+width-2, y+height-2,x+width-2,y+height-2-val,graph_color_background);
     const uint8_t x_pos = x + width - 2 - x_position_subtractor;
-    glcd_draw_line(x_pos, y+height-1, x_pos, y+1, graph_color_background);//black out the background
+    glcd_draw_line(x_pos, y+height-2, x_pos, y+1, graph_color_background);//black out the background
     glcd_set_pixel(x_pos, y+height-2-val, graph_color_line);//place a pixel on top of what you blacked out
 
 

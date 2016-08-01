@@ -81,6 +81,8 @@ void glcd_set_font(const char * font_table, uint8_t width, uint8_t height, char 
  */
 uint8_t glcd_draw_char_xy(uint8_t x, uint8_t y, char c);
 
+uint8_t glcd_get_char_width(char c);
+
 /** Draw a string at specified location.
  *  \param x x location to place top-left of character frame
  *  \param y y location to place top-left of character frame

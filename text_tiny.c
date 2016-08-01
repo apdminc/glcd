@@ -52,6 +52,10 @@ uint8_t glcd_get_current_font_height(void) {
   return(font_current.height);
 }
 
+uint8_t glcd_get_current_font_width(void) {
+  return(font_current.width);
+}
+
 void glcd_tiny_draw_char(uint8_t x, uint8_t line, char c)
 {
 	uint8_t i;

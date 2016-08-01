@@ -64,6 +64,7 @@ void glcd_tiny_set_font(const char *font_table, uint8_t width, uint8_t height, c
  * FIXME document this
  */
 uint8_t glcd_get_current_font_height(void);
+uint8_t glcd_get_current_font_width(void);
 
 /** Write character to LCD in tiny 5x7 font.
  *  \param x    column position to start 

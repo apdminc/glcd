@@ -59,6 +59,36 @@ void glcd_set_font(const char * font_table, uint8_t width, uint8_t height, char 
 	font_current.table_type = MIKRO; // only supports MikroElektronika generated format
 }
 
+uint8_t glcd_get_char_width(char c) {
+  if (c < font_current.start_char || c > font_current.end_char) {
+      c = '.';
+  }
+
+  if (font_current.table_type == STANG) {
+      return font_current.width;
+
+  } else if (font_current.table_type == MIKRO) {
+      uint8_t var_width;
+
+      uint8_t bytes_high = font_current.height / 8 + 1;
+      uint8_t bytes_per_char = font_current.width * bytes_high + 1;
+
+      const char *p;
+      p = font_current.font_table + (c - font_current.start_char) * bytes_per_char;
+
+#if defined(GLCD_DEVICE_AVR8)
+      var_width = pgm_read_byte(p);
+#else
+      var_width = *p;
+#endif
+
+      return var_width;
+  } else {
+      // don't recognize the font table
+      return 0;
+  }
+}
+
 uint8_t glcd_draw_char_xy(uint8_t x, uint8_t y, char c)
 {
 	if (c < font_current.start_char || c > font_current.end_char) {
