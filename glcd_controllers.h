@@ -101,8 +101,6 @@ void glcd_set_x_address(uint8_t x);
  */
 void glcd_write(void);
 
-void glcd_strobe_cs_line(const bool force_strobe);
-
 /** @}*/
 
 #endif /* GLCD_CONTROLLERS_H_ */

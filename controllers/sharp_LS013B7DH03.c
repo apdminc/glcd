@@ -107,23 +107,9 @@ void glcd_write_bounded(const int ymin, const int ymax)
   glcd_reset_bbox();
 }
 
-systime_t last_cs_strobe_time = 0;
-
-void glcd_strobe_cs_line(const bool force_strobe) {
-#if 0
-  //Data sheet for the sharp LCD says that you must strobe the CS line at least once during the COMM period otherwise you will get LCD burnin.
-  systime_t now = chTimeNow();
-  if( force_strobe || (now - last_cs_strobe_time) > 500 ) {
-    GLCD_DESELECT();
-    GLCD_SELECT();
-    last_cs_strobe_time = now;
-  }
-#endif
-}
 
 /* Write screen buffer to display, within bounding box only */
 void glcd_write() {
-  last_cs_strobe_time = chTimeNow();
   glcd_write_bounded(-1, -1);
 }
 
