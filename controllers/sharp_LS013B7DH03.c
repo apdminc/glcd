@@ -71,13 +71,13 @@ void glcd_write_bounded(const int ymin, const int ymax)
 
   if( ymin >= 0 ) {
     y_row = ymin;
-  } else if( glcd_bbox_selected != NULL && glcd_bbox_selected->y_min >= 0 ) {
+  } else if( glcd_bbox_selected != NULL ) {
     y_row = glcd_bbox_selected->y_min;
   }
 
   if( ymax >= 0 ) {
     y_row_max = ymax;
-  } else if( glcd_bbox_selected != NULL && glcd_bbox_selected->y_max >= 0 ) {
+  } else if( glcd_bbox_selected != NULL ) {
     y_row_max = glcd_bbox_selected->y_max;
   }
 
