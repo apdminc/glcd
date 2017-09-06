@@ -133,12 +133,43 @@ void glcd_draw_rect_thick(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t tx
 void glcd_draw_rect_shadow(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t color);
 
 /**
- * Draw circle but do not fill.
+ * Draw circle but do not fill and limit drawing to a specified bounding box.
  * The border of the rectangle is the same as fill colour
  * \param x0 Centre x-coordinate (left-most)
  * \param y0 Centre y-coordinate (top-most)
  * \param r  Radius
  * \param color Colour of border
+ * \param min_x Minimum X choord for bounding box
+ * \param min_y Minimum Y choord for bounding box
+ * \param max_x Maximum X choord for bounding box
+ * \param max_y Maximum Y choord for bounding box
+ * \see ColourConstants
+ */
+void glcd_draw_circle_section(const int16_t x0, const int16_t y0, const uint16_t r, const uint8_t color, const uint8_t min_x, const uint8_t min_y, const uint8_t max_x, const uint8_t max_y);
+
+/**
+ * Draw circle and fill.
+ * The border of the rectangle is the same as fill colour
+ * \param x0 Centre x-coordinate (left-most)
+ * \param y0 Centre y-coordinate (top-most)
+ * \param r  Radius
+ * \param color Colour of border
+ * \see ColourConstants
+ */
+void glcd_fill_circle_section(uint8_t x0, uint8_t y0, uint8_t r, uint8_t color, const uint8_t min_x, const uint8_t min_y, const uint8_t max_x, const uint8_t max_y);
+
+
+/**
+ * Draw circle but do not fill and limit drawing to a specified bounding box.
+ * The border of the rectangle is the same as fill colour
+ * \param x0 Centre x-coordinate (left-most)
+ * \param y0 Centre y-coordinate (top-most)
+ * \param r  Radius
+ * \param color Colour of border
+ * \param min_x Minimum X choord for bounding box
+ * \param min_y Minimum Y choord for bounding box
+ * \param max_x Maximum X choord for bounding box
+ * \param max_y Maximum Y choord for bounding box
  * \see ColourConstants
  */
 void glcd_draw_circle(uint8_t x0, uint8_t y0, uint8_t r, uint8_t color);

@@ -231,6 +231,53 @@ void glcd_draw_rect_shadow(uint8_t x, uint8_t y, uint8_t w, uint8_t h, uint8_t c
 	glcd_draw_line(x+w, y+1, x+w, y+h, color);
 }
 
+
+void glcd_set_pixel_a(const uint8_t x, const uint8_t y, const uint8_t color, const uint8_t min_x, const uint8_t min_y, const uint8_t max_x, const uint8_t max_y)
+{
+  if( x >= min_x && x <= max_x && y >= min_y && y <= max_y ) {
+    glcd_set_pixel(x, y, color);
+  }
+}
+
+
+void glcd_draw_circle_section(const int16_t x0, const int16_t y0, const uint16_t r, const uint8_t color, const uint8_t min_x, const uint8_t min_y, const uint8_t max_x, const uint8_t max_y)
+{
+    int8_t f = 1 - r;
+    int8_t ddF_x = 1;
+    int8_t ddF_y = -2 * r;
+    int8_t x = 0;
+    int8_t y = r;
+
+    glcd_update_bbox(x0-r, y0-r, x0+r, y0+r);
+
+    glcd_set_pixel_a(x0, y0+r, color, min_x, min_y, max_x, max_y);
+    glcd_set_pixel_a(x0, y0-r, color, min_x, min_y, max_x, max_y);
+    glcd_set_pixel_a(x0+r, y0, color, min_x, min_y, max_x, max_y);
+    glcd_set_pixel_a(x0-r, y0, color, min_x, min_y, max_x, max_y);
+
+    while (x<y) {
+        if (f >= 0) {
+            y--;
+            ddF_y += 2;
+            f += ddF_y;
+        }
+        x++;
+        ddF_x += 2;
+        f += ddF_x;
+
+        glcd_set_pixel_a(x0 + x, y0 + y, color, min_x, min_y, max_x, max_y);
+        glcd_set_pixel_a(x0 - x, y0 + y, color, min_x, min_y, max_x, max_y);
+        glcd_set_pixel_a(x0 + x, y0 - y, color, min_x, min_y, max_x, max_y);
+        glcd_set_pixel_a(x0 - x, y0 - y, color, min_x, min_y, max_x, max_y);
+
+        glcd_set_pixel_a(x0 + y, y0 + x, color, min_x, min_y, max_x, max_y);
+        glcd_set_pixel_a(x0 - y, y0 + x, color, min_x, min_y, max_x, max_y);
+        glcd_set_pixel_a(x0 + y, y0 - x, color, min_x, min_y, max_x, max_y);
+        glcd_set_pixel_a(x0 - y, y0 - x, color, min_x, min_y, max_x, max_y);
+
+    }
+}
+
 void glcd_draw_circle(uint8_t x0, uint8_t y0, uint8_t r, uint8_t color)
 {
 		
@@ -268,6 +315,44 @@ void glcd_draw_circle(uint8_t x0, uint8_t y0, uint8_t r, uint8_t color)
 		glcd_set_pixel(x0 - y, y0 - x, color);
 		
 	}
+}
+
+void glcd_fill_circle_section(uint8_t x0, uint8_t y0, uint8_t r, uint8_t color, const uint8_t min_x, const uint8_t min_y, const uint8_t max_x, const uint8_t max_y)
+{
+
+    int8_t f = 1 - r;
+    int8_t ddF_x = 1;
+    int8_t ddF_y = -2 * r;
+    int8_t x = 0;
+    int8_t y = r;
+
+    int16_t i;
+
+    glcd_update_bbox(x0-r, y0-r, x0+r, y0+r);
+
+    for (i=y0-r; i<=y0+r; i++) {
+        glcd_set_pixel_a(x0, i, color, min_x, min_y, max_x, max_y);
+    }
+
+    while (x < y) {
+        if (f >= 0) {
+            y--;
+            ddF_y += 2;
+            f += ddF_y;
+        }
+        x++;
+        ddF_x += 2;
+        f += ddF_x;
+
+        for (i=y0-y; i<=y0+y; i++) {
+            glcd_set_pixel_a(x0+x, i, color, min_x, min_y, max_x, max_y);
+            glcd_set_pixel_a(x0-x, i, color, min_x, min_y, max_x, max_y);
+        }
+        for (i=y0-x; i<=y0+x; i++) {
+            glcd_set_pixel_a(x0+y, i, color, min_x, min_y, max_x, max_y);
+            glcd_set_pixel_a(x0-y, i, color, min_x, min_y, max_x, max_y);
+        }
+    }
 }
 
 void glcd_fill_circle(uint8_t x0, uint8_t y0, uint8_t r, uint8_t color)
