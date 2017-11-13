@@ -73,7 +73,7 @@ void glcd_tiny_draw_char(uint8_t x, uint8_t line, char c)
 	glcd_update_bbox(x, line*(font_current.height + 1), x+font_current.width, line*(font_current.height + 1) + (font_current.height + 1));
 	
 	for ( i = 0; i < font_current.width; i++ ) {
-		glcd_buffer_selected[x + (line * GLCD_LCD_WIDTH)] = *( font_current.font_table + ((c - font_current.start_char) * (font_current.width)) + i );
+		glcd_buffer[x + (line * GLCD_LCD_WIDTH)] = *( font_current.font_table + ((c - font_current.start_char) * (font_current.width)) + i );
 		glcd_update_bbox(x, line, x, line + font_current.width);
 		x++;
 	}
@@ -95,44 +95,6 @@ void glcd_tiny_draw_string(uint8_t x, uint8_t line, char *str)
 			return; /* Ran out of space :( */
 	}
 }
-#if 0
-void glcd_tiny_draw_string_P(uint8_t x, uint8_t line, const char *str)
-{
-	if (font_current.height >= 8) {
-		return;
-	}
-	while (1) {
-		char c = *(str++);
-		if (!c)
-			return;	
-				
-		glcd_tiny_draw_char(x, line, c);
-		
-		x += (font_current.width + 1);
-		if ((x + font_current.width + 1) > GLCD_LCD_WIDTH) {
-			x = 0; /* Ran out of this line */
-			line++;
-		}
-		if (line >= (GLCD_LCD_HEIGHT/(font_current.height + 1)))
-			return; /* Ran out of space :( */
-	}	
-}
-#endif
-
-#if 0
-
-void glcd_tiny_draw_string_ammend(char *str) {
-	glcd_scroll_line();
-	glcd_tiny_draw_string(0, (GLCD_LCD_HEIGHT/8-1), str);
-	glcd_write();
-}
-
-void glcd_tiny_draw_string_ammend_P(const char *str) {
-	glcd_scroll_line();
-	glcd_tiny_draw_string_P(0, (GLCD_LCD_HEIGHT/8-1), str);
-	glcd_write();
-}
-#endif
 
 void glcd_tiny_invert_line(uint8_t line)
 {

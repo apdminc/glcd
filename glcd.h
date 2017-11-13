@@ -199,8 +199,6 @@ typedef enum {
 /* Global variables used for GLCD library */
 extern uint8_t glcd_buffer[(GLCD_LCD_WIDTH * GLCD_LCD_HEIGHT / 8) + 1];
 extern glcd_BoundingBox_t glcd_bbox;
-extern uint8_t *glcd_buffer_selected;
-extern glcd_BoundingBox_t *glcd_bbox_selected;
 extern glcd_screen_rotation_mode_t glcd_screen_rotation;
 
 /** \name Base Functions 
@@ -225,7 +223,6 @@ void glcd_set_foreground_color(uint8_t color);
  * \param xmax Maximum x value of rectangle
  * \param ymax Maximum y value of rectangle
  * \see glcd_bbox
- * \see glcd_bbox_selected
  */
 void glcd_update_bbox(uint8_t xmin, uint8_t ymin, uint8_t xmax, uint8_t ymax);
 
@@ -255,23 +252,6 @@ void glcd_clear(void);
  */
 void glcd_clear_buffer(void);
 
-/**
- * Select screen buffer and bounding box structure.
- * This should be selected at initialisation. There are future plans to support multiple screen buffers
- * but this not yet available.
- * \param buffer Pointer to screen buffer
- * \param bbox   Pointer to bounding box object.
- * \see glcd_BoundingBox_t
- */
-void glcd_select_screen(uint8_t *buffer, glcd_BoundingBox_t *bbox);
-
-
-/**
- * Scroll screen buffer up by 8 pixels.
- * This is designed to be used in conjunciton with tiny text functions which are 8 bits high.
- * \see Tiny Text
- */
-//void glcd_scroll_line(void);
 
 void glcd_set_screen_rotation(const glcd_screen_rotation_mode_t mode);
 glcd_screen_rotation_mode_t glcd_get_screen_rotation(void);
@@ -287,7 +267,6 @@ uint8_t glcd_reverse_significant_bits(uint32_t value);
 enum font_table_type { STANG, MIKRO };
 
 
-
 typedef struct {
 	const char *font_table;
 	uint8_t width;
@@ -297,8 +276,6 @@ typedef struct {
 	enum font_table_type table_type;
 } glcd_FontConfig_t;
 
-extern uint8_t *glcd_buffer_selected;
-extern glcd_BoundingBox_t *glcd_bbox_selected;
 extern glcd_FontConfig_t font_current;
 
 #endif

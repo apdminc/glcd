@@ -5,7 +5,6 @@
 #include "string.h"
 
 
-
 void glcd_command(uint8_t c)
 {
 }
@@ -71,31 +70,26 @@ void glcd_write_bounded(const int ymin, const int ymax)
 
   if( ymin >= 0 ) {
     y_row = ymin;
-  } else if( glcd_bbox_selected != NULL ) {
+  } else {
     //FIXME for some reason, when text is written the bounding box values are not updated properly
-    //y_row = glcd_bbox_selected->y_min;
+    //y_row = glcd_bbox.y_min;
   }
 
   if( ymax >= 0 ) {
     y_row_max = ymax;
-  } else if( glcd_bbox_selected != NULL ) {
+  } else {
     //FIXME for some reason, when text is written the bounding box values are not updated properly
-    //y_row_max = glcd_bbox_selected->y_max;
+    //y_row_max = glcd_bbox.y_max;
   }
 
 
-  //row_write_count = 0;
   for(; y_row <= y_row_max && y_row >= 0 && y_row < MLCD_YRES; y_row++ ) {
 #if GLCD_DIRTY_ROW_WRITES
-    if( glcd_bbox_selected != NULL ) {
-      const int byte_offset = y_row / 8;
-      const int bit_offset = y_row % 8;
-      if( ! (glcd_bbox_selected->modified_rows_bitmask[byte_offset] & (1<<bit_offset)) ) {
-        //Row dirty bit check
-        continue;
-      } else {
-        //row_write_count++;
-      }
+    const int byte_offset = y_row / 8;
+    const int bit_offset = y_row % 8;
+    if( ! (glcd_bbox.modified_rows_bitmask[byte_offset] & (1<<bit_offset)) ) {
+      //Row dirty bit check
+      continue;
     }
 #endif
 

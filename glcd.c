@@ -54,16 +54,6 @@ uint8_t glcd_buffer[(GLCD_LCD_WIDTH * GLCD_LCD_HEIGHT / 8) + 1];
  */
 glcd_BoundingBox_t glcd_bbox;
 
-/**
- * Pointer to screen buffer currently in use.
- */
-uint8_t *glcd_buffer_selected = NULL;
-
-/**
- * Pointer to bounding box currently in use.
- */
-glcd_BoundingBox_t *glcd_bbox_selected = NULL;
-
 
 /**
  * The current screen orientation
@@ -93,10 +83,6 @@ void glcd_set_foreground_color(uint8_t color) {
 
 void glcd_update_bbox(uint8_t xmin, uint8_t ymin, uint8_t xmax, uint8_t ymax)
 {
-    if( glcd_bbox_selected == NULL ) {
-      return;
-    }
-
 	/* Keep and check bounding box within limits of LCD screen dimensions */
 	if (xmin > (GLCD_LCD_WIDTH-1)) {
 		xmin = GLCD_LCD_WIDTH-1;
@@ -116,47 +102,44 @@ void glcd_update_bbox(uint8_t xmin, uint8_t ymin, uint8_t xmax, uint8_t ymax)
     for(int v = ymin; v <= ymax; v++ ) {
       const uint32_t byte_offset = v / 8;
       const uint32_t bit_offset = v % 8;
-      if( byte_offset < sizeof(glcd_bbox_selected->modified_rows_bitmask) ) {
-        glcd_bbox_selected->modified_rows_bitmask[byte_offset] |= (1<<bit_offset);
+      if( byte_offset < sizeof(glcd_bbox.modified_rows_bitmask) ) {
+        glcd_bbox.modified_rows_bitmask[byte_offset] |= (1<<bit_offset);
       }
     }
 #else
     for(int v = xmin; v <= xmax; v++ ) {
       const uint32_t byte_offset = v / 8;
       const uint32_t bit_offset = v % 8;
-      if( byte_offset < sizeof(glcd_bbox_selected->modified_rows_bitmask) ) {
-        glcd_bbox_selected->modified_rows_bitmask[byte_offset] |= (1<<bit_offset);
+      if( byte_offset < sizeof(glcd_bbox.modified_rows_bitmask) ) {
+        glcd_bbox.modified_rows_bitmask[byte_offset] |= (1<<bit_offset);
       }
     }
 #endif
 
     /* Update the bounding box size */
-    if (xmin < glcd_bbox_selected->x_min) {
-        glcd_bbox_selected->x_min = xmin;
+    if (xmin < glcd_bbox.x_min) {
+        glcd_bbox.x_min = xmin;
     }
-    if (xmax > glcd_bbox_selected->x_max) {
-        glcd_bbox_selected->x_max = xmax;
+    if (xmax > glcd_bbox.x_max) {
+        glcd_bbox.x_max = xmax;
     }
-    if (ymin < glcd_bbox_selected->y_min) {
-        glcd_bbox_selected->y_min = ymin;
+    if (ymin < glcd_bbox.y_min) {
+        glcd_bbox.y_min = ymin;
     }
-    if (ymax > glcd_bbox_selected->y_max) {
-        glcd_bbox_selected->y_max = ymax;
+    if (ymax > glcd_bbox.y_max) {
+        glcd_bbox.y_max = ymax;
     }
 }
 
 void glcd_reset_bbox()
 {
-  if( glcd_bbox_selected == NULL ) {
-    return;
-  }
 	/* Used after physically writing to the LCD */
-	glcd_bbox_selected->x_min = GLCD_LCD_WIDTH - 1;
-	glcd_bbox_selected->x_max = 0;
-	glcd_bbox_selected->y_min = GLCD_LCD_HEIGHT -1;
-	glcd_bbox_selected->y_max = 0;
+	glcd_bbox.x_min = GLCD_LCD_WIDTH - 1;
+	glcd_bbox.x_max = 0;
+	glcd_bbox.y_min = GLCD_LCD_HEIGHT -1;
+	glcd_bbox.y_max = 0;
 
-	memset(&glcd_bbox_selected->modified_rows_bitmask, 0x00, sizeof(glcd_bbox_selected->modified_rows_bitmask));
+	memset(&glcd_bbox.modified_rows_bitmask, 0x00, sizeof(glcd_bbox.modified_rows_bitmask));
 }
 
 void glcd_bbox_reset() {
@@ -164,22 +147,19 @@ void glcd_bbox_reset() {
 }
 
 void glcd_bbox_refresh() {
-    if( glcd_bbox_selected == NULL ) {
-      return;
-    }
 	/* Marks bounding box as entire screen, so on next glcd_write(), it writes the entire buffer to the LCD */
-	glcd_bbox_selected->x_min = 0;
-	glcd_bbox_selected->x_max = GLCD_LCD_WIDTH - 1;
-	glcd_bbox_selected->y_min = 0;
-	glcd_bbox_selected->y_max = GLCD_LCD_HEIGHT -1;		
+	glcd_bbox.x_min = 0;
+	glcd_bbox.x_max = GLCD_LCD_WIDTH - 1;
+	glcd_bbox.y_min = 0;
+	glcd_bbox.y_max = GLCD_LCD_HEIGHT -1;
 
-	memset(&glcd_bbox_selected->modified_rows_bitmask, 0xFF, sizeof(glcd_bbox_selected->modified_rows_bitmask));
+	memset(&glcd_bbox.modified_rows_bitmask, 0xFF, sizeof(glcd_bbox.modified_rows_bitmask));
 }
 
 
 
 void glcd_clear_buffer(void) {
-	memset(glcd_buffer_selected, 0x00, GLCD_LCD_WIDTH * GLCD_LCD_HEIGHT / 8);
+	memset(glcd_buffer, 0x00, sizeof(glcd_buffer));
 	glcd_update_bbox(0,0,GLCD_LCD_WIDTH - 1,GLCD_LCD_HEIGHT - 1);
 }
 
@@ -187,31 +167,6 @@ void glcd_clear(void) {
     glcd_clear_buffer();
     glcd_write();
 }
-
-void glcd_select_screen(uint8_t *buffer, glcd_BoundingBox_t *bbox)
-{
-	glcd_buffer_selected = buffer;
-	glcd_bbox_selected = bbox;
-}
-
-#if 0
-void glcd_scroll_line(void)
-{
-	uint8_t y;
-	uint8_t number_of_rows = GLCD_LCD_HEIGHT / 8;
-	for (y=0; y<number_of_rows; y++) {
-		if (y < (number_of_rows - 1)) {
-			/* All lines except the last */
-			memcpy(glcd_buffer_selected + y*GLCD_LCD_WIDTH, glcd_buffer_selected + y*GLCD_LCD_WIDTH + GLCD_LCD_WIDTH, GLCD_LCD_WIDTH);
-		} else {
-			/* Last line, clear it */
-			memset(glcd_buffer_selected + (number_of_rows - 1)*GLCD_LCD_WIDTH, 0x00, GLCD_LCD_WIDTH);
-		}
-	}
-	glcd_update_bbox(0,0,GLCD_LCD_WIDTH - 1,GLCD_LCD_HEIGHT - 1);
-}
-#endif
-
 
 #ifdef GLCD_USE_CORTEX_M3_INSTRUCTIONS
 /*

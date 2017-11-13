@@ -439,28 +439,8 @@ void glcd_invert_area(uint8_t x, uint8_t y, uint8_t w, uint8_t h)
 
 void glcd_draw_bitmap(const unsigned char *data)
 {
-
-#if 0
-	/* Testing purposes only: Writing to the LCD right away (not for AVR) */
-	/* Normally, we do not do this, we just write to the screen buffer */
-	uint8_t *original_buffer;
-
-	/* Save the location of original screen buffer */
-	original_buffer = glcd_buffer_selected;
-	
-	/* Use bitmap location as screen buffer (this won't work when using AVR8 PGM_P) */
-	glcd_select_screen((uint8_t *)data, glcd_bbox_selected);
-	
-	/* Make sure we write the entre display */
-	glcd_bbox_refresh(); 
-	glcd_write();
-	
-	/* Restore the screen buffer back to original */
-	glcd_select_screen(original_buffer, glcd_bbox_selected);	
-#endif
-	
 	/* Copy bitmap data to the screen buffer */
-	memcpy(glcd_buffer_selected, data, (GLCD_LCD_WIDTH * GLCD_LCD_HEIGHT / 8));
+	memcpy(glcd_buffer, data, (GLCD_LCD_WIDTH * GLCD_LCD_HEIGHT / 8));
 
 	glcd_bbox_refresh(); 
 }
