@@ -36,13 +36,7 @@
 #ifndef GLCD_DEVICES_H_
 #define GLCD_DEVICES_H_
 
-#if defined(GLCD_DEVICE_AVR8)
-	#include <avr/io.h>
-#elif defined(GLCD_DEVICE_LPC111X)
-	#include "LPC11xx.h"
-#elif defined(GLCD_DEVICE_LPC11UXX)
-	#include "LPC11Uxx.h"
-#elif defined(GLCD_DEVICE_STM32F0XX)
+#if defined(GLCD_DEVICE_STM32F0XX)
 	#include "STM32F0xx.h"
 #elif defined(GLCD_DEVICE_STM32F4XX_CHIBIOS)
     #include "ch.h"

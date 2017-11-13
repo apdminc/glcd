@@ -54,11 +54,7 @@
  *        glcd_set_font()
  *  \see glcd_set_font() 
  */
-#if defined(GLCD_DEVICE_AVR8)  
-void glcd_tiny_set_font(PGM_P font_table, uint8_t width, uint8_t height, char start_char, char end_char);
-#else
 void glcd_tiny_set_font(const char *font_table, uint8_t width, uint8_t height, char start_char, char end_char);
-#endif
 
 /**
  * FIXME document this
@@ -87,11 +83,7 @@ void glcd_tiny_draw_string(uint8_t x, uint8_t line, char *str);
  *  \param line line to be written (each line is 8 pixels high)
  *  \param str  string stored in flash memory to be written
  */
-#if defined(GLCD_DEVICE_AVR8) 
-void glcd_tiny_draw_string_P(uint8_t x, uint8_t line, PGM_P str);
-#else
 void glcd_tiny_draw_string_P(uint8_t x, uint8_t line, const char *str);
-#endif
 
 /** Write string to bottom row of display.
  *  Screen buffer is scrolled up by one line. Screen is then physically updated.
@@ -103,11 +95,7 @@ void glcd_tiny_draw_string_ammend(char *str);
  *  Screen buffer is scrolled up by one line. Screen is then physically updated.
  *  \param str string to be written
  */
-#if defined(GLCD_DEVICE_AVR8)
-void glcd_tiny_draw_string_ammend_P(PGM_P str);
-#else
 void glcd_tiny_draw_string_ammend_P(const char *str);
-#endif
 
 /**
  * Invert all contents of line number. Line 0 is the top most line.

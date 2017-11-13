@@ -42,7 +42,11 @@
 #include <string.h>
 #include "glcd.h"
 
-
+#if GLCD_MSB_BUFFER_PACKING
+#  define GLCD_BUFFER_BYTE_MASK(y) (1 << (y % 8))
+#else
+#  define GLCD_BUFFER_BYTE_MASK(y) (0x80 >> (y % 8))
+#endif
 
 void glcd_set_screen_rotation(const glcd_screen_rotation_mode_t mode) {
   glcd_screen_rotation = mode;
@@ -91,15 +95,19 @@ void glcd_set_pixel(uint8_t x, uint8_t y, uint8_t color) {
 		return;
 	}
 
+	const uint32_t buffer_index = (x+ (y/8)*GLCD_LCD_WIDTH);
+	const uint8_t old_value = glcd_buffer[buffer_index];
 	if (color) {
 		/* Set black */
-		glcd_buffer[x+ (y/8)*GLCD_LCD_WIDTH] |= ( 1 << (y%8));
+		glcd_buffer[buffer_index] |= GLCD_BUFFER_BYTE_MASK(y);
 	} else {
 		/* Set white */
-		glcd_buffer[x+ (y/8)*GLCD_LCD_WIDTH] &= ~ (1 << (y%8));
+		glcd_buffer[buffer_index] &= ~(GLCD_BUFFER_BYTE_MASK(y));
 	}
 
-	glcd_update_bbox(x,y,x,y);
+	if( old_value != glcd_buffer[buffer_index] ) {
+	  glcd_update_bbox(x,y,x,y);
+	}
 }
 
 /* Based on PCD8544 library by Limor Fried */
@@ -109,7 +117,7 @@ uint8_t glcd_get_pixel(uint8_t x, uint8_t y) {
 		return 0;
 	}
 	
-	if ( glcd_buffer[x+ (y/8)*GLCD_LCD_WIDTH] & ( 1 << (y%8)) ) {
+	if ( glcd_buffer[x+ (y/8)*GLCD_LCD_WIDTH] & (GLCD_BUFFER_BYTE_MASK(y)) ) {
 		return 1;
 	} else {
 		return 0;
@@ -121,8 +129,8 @@ void glcd_invert_pixel(uint8_t x, uint8_t y) {
 	if ((x >= GLCD_LCD_WIDTH) || (y >= GLCD_LCD_HEIGHT)) {
 		return;
 	}
+	glcd_buffer[x+ (y/8)*GLCD_LCD_WIDTH] ^= ( GLCD_BUFFER_BYTE_MASK(y));
 	glcd_update_bbox(x,y,x,y);
-	glcd_buffer[x+ (y/8)*GLCD_LCD_WIDTH] ^= ( 1 << (y%8));
 }
 
 /* Bresenham's algorithm - based on PCD8544 library Limor Fried */
@@ -428,11 +436,7 @@ void glcd_draw_bitmap(const unsigned char *data)
 #endif
 	
 	/* Copy bitmap data to the screen buffer */
-#if defined(GLCD_DEVICE_AVR8)
-	memcpy_P(glcd_buffer_selected, data, (GLCD_LCD_WIDTH * GLCD_LCD_HEIGHT / 8));
-#else
 	memcpy(glcd_buffer_selected, data, (GLCD_LCD_WIDTH * GLCD_LCD_HEIGHT / 8));
-#endif
 
 	glcd_bbox_refresh(); 
 }

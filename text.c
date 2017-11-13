@@ -44,11 +44,7 @@ void glcd_text_set_foreground_color(uint8_t color) {
   font_color_background = (color == BLACK ? WHITE : BLACK);
 }
 
-#if defined(GLCD_DEVICE_AVR8)
-void glcd_set_font(PGM_P font_table, uint8_t width, uint8_t height, char start_char, char end_char)
-#else
 void glcd_set_font(const char * font_table, uint8_t width, uint8_t height, char start_char, char end_char)
-#endif
 {
 	// supports variable width fonts
 	font_current.font_table = font_table;
@@ -76,11 +72,7 @@ uint8_t glcd_get_char_width(char c) {
       const char *p;
       p = font_current.font_table + (c - font_current.start_char) * bytes_per_char;
 
-#if defined(GLCD_DEVICE_AVR8)
-      var_width = pgm_read_byte(p);
-#else
       var_width = *p;
-#endif
 
       return var_width;
   } else {
@@ -100,11 +92,7 @@ uint8_t glcd_draw_char_xy(uint8_t x, uint8_t y, char c)
 			
 		uint8_t i;
 		for ( i = 0; i < font_current.width; i++ ) {
-#if defined(GLCD_DEVICE_AVR8)			
-			uint8_t dat = pgm_read_byte( font_current.font_table + ((c - font_current.start_char) * (font_current.width)) + i );
-#else
 			uint8_t dat = *( font_current.font_table + ((c - font_current.start_char) * (font_current.width)) + i );
-#endif
 			uint8_t j;
 			for (j = 0; j < 8; j++) {
 				if (x+i >= GLCD_LCD_WIDTH || y+j >= GLCD_LCD_HEIGHT) {
@@ -131,11 +119,7 @@ uint8_t glcd_draw_char_xy(uint8_t x, uint8_t y, char c)
 		const char *p;
 		p = font_current.font_table + (c - font_current.start_char) * bytes_per_char;
 
-#if defined(GLCD_DEVICE_AVR8)		
-		var_width = pgm_read_byte(p);
-#else
 		var_width = *p;
-#endif
 		p++; // step over the variable width field
 
 		/*
@@ -148,11 +132,7 @@ uint8_t glcd_draw_char_xy(uint8_t x, uint8_t y, char c)
 		for ( i = 0; i < var_width; i++ ) {
 			uint8_t j;
 			for ( j = 0; j < bytes_high; j++ ) {
-#if defined(GLCD_DEVICE_AVR8)				
-				uint8_t dat = pgm_read_byte( p + i*bytes_high + j );
-#else
 				uint8_t dat = *( p + i*bytes_high + j );
-#endif
 				uint8_t bit;
 				for (bit = 0; bit < 8; bit++) {
 					
@@ -207,11 +187,7 @@ void glcd_draw_string_xy_P(uint8_t x, uint8_t y, const char *str)
 	}
 
 	while (1) {
-#if defined(GLCD_DEVICE_AVR8)		
-		char c = pgm_read_byte(str++);
-#else
 		char c = *(str++);
-#endif
 		if (!c)
 			return;
 					

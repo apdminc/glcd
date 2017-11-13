@@ -34,11 +34,7 @@
 
 #include "glcd.h"
 
-#if defined(GLCD_DEVICE_AVR8)
-void glcd_tiny_set_font(PGM_P font_table, uint8_t width, uint8_t height, char start_char, char end_char)
-#else
 void glcd_tiny_set_font(const char * font_table, uint8_t width, uint8_t height, char start_char, char end_char)
-#endif
 {
 	font_current.font_table = font_table;
 	font_current.width = width;
@@ -77,11 +73,8 @@ void glcd_tiny_draw_char(uint8_t x, uint8_t line, char c)
 	glcd_update_bbox(x, line*(font_current.height + 1), x+font_current.width, line*(font_current.height + 1) + (font_current.height + 1));
 	
 	for ( i = 0; i < font_current.width; i++ ) {
-#if defined(GLCD_DEVICE_AVR8)		
-		glcd_buffer_selected[x + (line * GLCD_LCD_WIDTH)] = pgm_read_byte( font_current.font_table + ((c - font_current.start_char) * (font_current.width)) + i );
-#else
 		glcd_buffer_selected[x + (line * GLCD_LCD_WIDTH)] = *( font_current.font_table + ((c - font_current.start_char) * (font_current.width)) + i );
-#endif
+		glcd_update_bbox(x, line, x, line + font_current.width);
 		x++;
 	}
 }
@@ -103,21 +96,13 @@ void glcd_tiny_draw_string(uint8_t x, uint8_t line, char *str)
 	}
 }
 
-#if defined(GLCD_DEVICE_AVR8)
-void glcd_tiny_draw_string_P(uint8_t x, uint8_t line, PGM_P str)
-#else
 void glcd_tiny_draw_string_P(uint8_t x, uint8_t line, const char *str)
-#endif
 {
 	if (font_current.height >= 8) {
 		return;
 	}
 	while (1) {
-#if defined(GLCD_DEVICE_AVR8)				
-		char c = pgm_read_byte(str++);
-#else
 		char c = *(str++);
-#endif
 		if (!c)
 			return;	
 				
@@ -169,11 +154,7 @@ void glcd_tiny_draw_char_xy(uint8_t x, uint8_t y, char c)
 	xvar = x;
 	
 	for ( i = 0; i < font_current.width; i++ ) {
-#if defined(GLCD_DEVICE_AVR8)			
-		dat = pgm_read_byte( font_current.font_table + ((c - font_current.start_char) * (font_current.width)) + i );
-#else
 		dat = *( font_current.font_table + ((c - font_current.start_char) * (font_current.width)) + i );
-#endif
 		for (yvar = 0; yvar < font_current.height; yvar++) {
 			glcd_set_pixel(xvar,y+yvar, (dat & (1<<yvar) ? 1 : 0) );
 		}

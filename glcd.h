@@ -37,38 +37,14 @@
 
 #define GLCD_DEVICE_STM32F4XX_CHIBIOS
 #define GLCD_CONTROLLER_SHARP_LS013B7DH03
-#define GLCD_USE_SPI_UART             FALSE
+#define GLCD_USE_SPI_UART             0
 #define CHIBIOS_SPI_PEREPHERIAL       &SPID5
 #define CHIBIOS_UART_SPI_PEREPHERIAL  &UARTD3
 
+#define GLCD_MSB_BUFFER_PACKING       0
 
-#if defined(GLCD_DEVICE_AVR8)
-	#include <avr/pgmspace.h>
-	#include <avr/io.h>
-	#include <avr/interrupt.h>
-	#include "devices/AVR8.h"
-	
-	#if !defined(GLCD_USE_AVR_DELAY)
-		extern void delay_ms(uint32_t ms);
-	#else
-		/* Use AVR __delay_ms() function */
-		#include <util/delay.h>
-		#define delay_ms(t) _delay_ms(t)
-	#endif
-	
-#elif defined(GLCD_DEVICE_LPC111X)
-	#include <LPC11xx.h>
-	#include "devices/LPC111x.h"
-	extern void delay_ms(uint32_t ms);
-	#define PROGMEM
-	
-#elif defined(GLCD_DEVICE_LPC11UXX)
-	#include <LPC11Uxx.h>
-	#include "devices/LPC11Uxx.h"
-	extern void delay_ms(uint32_t ms);
-	#define PROGMEM
 
-#elif defined(GLCD_DEVICE_STM32F0XX)
+#if defined(GLCD_DEVICE_STM32F0XX)
 	#include <stm32f0xx.h>
 	#include <stm32f0xx_gpio.h>
 	#include "devices/inc/STM32F0xx.h"
@@ -91,9 +67,6 @@
 #endif
 
 
-
-
-
     #define delay_ms(t)                   chThdSleepMilliseconds(t)
     #include "devices/STM32F4_ChibiOS.h"
     #define PROGMEM
@@ -102,17 +75,8 @@
 	#error "Device not supported"
 	
 #endif
-
-#if defined(GLCD_CONTROLLER_PCD8544)
-	#include "controllers/PCD8544.h"
 	
-#elif defined(GLCD_CONTROLLER_ST7565R)
-	#include "controllers/ST7565R.h"	
-	
-#elif defined(GLCD_CONTROLLER_NT75451)
-	#include "controllers/NT75451.h"
-
-#elif defined(GLCD_CONTROLLER_SHARP_LS013B7DH03)
+#if defined(GLCD_CONTROLLER_SHARP_LS013B7DH03)
 	/* Note: you must either externally toggle the VCOM pin at at least 1hz, or configure the chip
 	 * and toggle the vcom bit in the SPI payload. This code assumes external toggling.
 	 */
@@ -120,8 +84,6 @@
     #define   USE_SPI_MULTIBYTE
     #define   BLACK 0
     #define   WHITE 1
-
-
 
     #if defined(GLCD_USE_PARALLEL)
         #error "The SHARP_LS013B7DH03 must use SPI"
@@ -135,8 +97,6 @@
 #endif
 
 #define swap(a, b) { uint8_t t = a; a = b; b = t; }
-
-
 
 
 #include <stdint.h>
@@ -159,15 +119,6 @@
   #define WHITE 0
 #endif
 
-
-
-
-
-//#define FONT_COLOR_TEXT           WHITE
-//#define FONT_COLOR_BACKGROUND     BLACK
-
-//#define GRAPH_COLOR_LINE           WHITE
-//#define GRAPH_COLOR_BACKGROUND     BLACK
 
 /**@}*/
 
@@ -224,6 +175,8 @@
 #define GLCD_RESET_TIME 1
 #endif
 
+
+#define MODIFIED_ROWS_SIZE ((GLCD_LCD_WIDTH / 8) + 1)
 /**
  * Bounding box for pixels that need to be updated
  */
@@ -232,6 +185,8 @@ typedef struct {
 	uint8_t y_min;
 	uint8_t x_max;
 	uint8_t y_max;
+
+	uint8_t modified_rows_bitmask[MODIFIED_ROWS_SIZE];
 } glcd_BoundingBox_t;
 
 typedef enum {
@@ -310,14 +265,6 @@ void glcd_clear_buffer(void);
  */
 void glcd_select_screen(uint8_t *buffer, glcd_BoundingBox_t *bbox);
 
-/**
- * Scroll entire screne buffer by x and y pixels. (not implemented yet)
- * \note Items scrolled off the extents of the display dimensions will be lost.
- *
- * \param x X distance to scroll
- * \param y Y distance to scroll
- */
-void glcd_scroll(int8_t x, int8_t y);
 
 /**
  * Scroll screen buffer up by 8 pixels.
