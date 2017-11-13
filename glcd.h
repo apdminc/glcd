@@ -197,7 +197,7 @@ typedef enum {
 } glcd_screen_rotation_mode_t;
 
 /* Global variables used for GLCD library */
-extern uint8_t glcd_buffer[GLCD_LCD_WIDTH * GLCD_LCD_HEIGHT / 8];
+extern uint8_t glcd_buffer[(GLCD_LCD_WIDTH * GLCD_LCD_HEIGHT / 8) + 1];
 extern glcd_BoundingBox_t glcd_bbox;
 extern uint8_t *glcd_buffer_selected;
 extern glcd_BoundingBox_t *glcd_bbox_selected;
@@ -271,7 +271,7 @@ void glcd_select_screen(uint8_t *buffer, glcd_BoundingBox_t *bbox);
  * This is designed to be used in conjunciton with tiny text functions which are 8 bits high.
  * \see Tiny Text
  */
-void glcd_scroll_line(void);
+//void glcd_scroll_line(void);
 
 void glcd_set_screen_rotation(const glcd_screen_rotation_mode_t mode);
 glcd_screen_rotation_mode_t glcd_get_screen_rotation(void);

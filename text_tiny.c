@@ -95,7 +95,7 @@ void glcd_tiny_draw_string(uint8_t x, uint8_t line, char *str)
 			return; /* Ran out of space :( */
 	}
 }
-
+#if 0
 void glcd_tiny_draw_string_P(uint8_t x, uint8_t line, const char *str)
 {
 	if (font_current.height >= 8) {
@@ -117,6 +117,9 @@ void glcd_tiny_draw_string_P(uint8_t x, uint8_t line, const char *str)
 			return; /* Ran out of space :( */
 	}	
 }
+#endif
+
+#if 0
 
 void glcd_tiny_draw_string_ammend(char *str) {
 	glcd_scroll_line();
@@ -129,6 +132,7 @@ void glcd_tiny_draw_string_ammend_P(const char *str) {
 	glcd_tiny_draw_string_P(0, (GLCD_LCD_HEIGHT/8-1), str);
 	glcd_write();
 }
+#endif
 
 void glcd_tiny_invert_line(uint8_t line)
 {

@@ -47,7 +47,7 @@
  * \param color Colour to set pixel
  * \see ColourConstants
  */
-void glcd_set_pixel(uint8_t x, uint8_t y, uint8_t color);
+void glcd_set_pixel(uint8_t x, uint8_t y, const uint8_t color);
 
 /**
  * Get state of pixel from specified location
@@ -69,7 +69,7 @@ void glcd_invert_pixel(uint8_t x, uint8_t y);
  *
  * \param color The color to set the screen to
  */
-void glcd_set_screen_buffer(uint8_t color);
+void glcd_set_screen_buffer(const uint8_t color);
 
 /**
  * Draw line

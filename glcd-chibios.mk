@@ -6,10 +6,10 @@ GLCDSRC =     ${GLCD_DIR}/glcd.c \
               ${GLCD_DIR}/graphs.c \
               ${GLCD_DIR}/text.c \
               ${GLCD_DIR}/text_tiny.c \
-              ${GLCD_DIR}/unit_tests.c \
               $(wildcard ${GLCD_DIR}/controllers/*.c) \
               $(wildcard ${GLCD_DIR}/devices/*.c)
 
+#${GLCD_DIR}/unit_tests.c \
 
 # Required include directories
 GLCDINC =     ${GLCD_DIR}/ \

@@ -83,19 +83,19 @@ void glcd_tiny_draw_string(uint8_t x, uint8_t line, char *str);
  *  \param line line to be written (each line is 8 pixels high)
  *  \param str  string stored in flash memory to be written
  */
-void glcd_tiny_draw_string_P(uint8_t x, uint8_t line, const char *str);
+//void glcd_tiny_draw_string_P(uint8_t x, uint8_t line, const char *str);
 
 /** Write string to bottom row of display.
  *  Screen buffer is scrolled up by one line. Screen is then physically updated.
  *  \param str string to be written
  */
-void glcd_tiny_draw_string_ammend(char *str);
+//void glcd_tiny_draw_string_ammend(char *str);
 
 /** Write string from flash memory to bottom row of display.
  *  Screen buffer is scrolled up by one line. Screen is then physically updated.
  *  \param str string to be written
  */
-void glcd_tiny_draw_string_ammend_P(const char *str);
+//void glcd_tiny_draw_string_ammend_P(const char *str);
 
 /**
  * Invert all contents of line number. Line 0 is the top most line.
@@ -120,10 +120,10 @@ void glcd_tiny_draw_char_xy(uint8_t x, uint8_t y, char c);
 #define GLCD_TEXT_INIT()  glcd_tiny_set_font(Font5x7,5,7,32,127);
 
 /** Write string to bottom-most line after scrolling everything else up */
-#define GLCD_WRITE(str)   glcd_tiny_draw_string_ammend(str)
+//#define GLCD_WRITE(str)   glcd_tiny_draw_string_ammend(str)
 
 /** Write string from program memory to bottom-most line after scrolling everything else up */
-#define GLCD_WRITE_P(str) glcd_tiny_draw_string_ammend_P(str)
+//#define GLCD_WRITE_P(str) glcd_tiny_draw_string_ammend_P(str)
 
 /** @}*/
 

@@ -46,7 +46,7 @@
  *
  *  Requires at least one bit for every pixel (e.g 504 bytes for 48x84 LCD)
  */
-uint8_t glcd_buffer[GLCD_LCD_WIDTH * GLCD_LCD_HEIGHT / 8];
+uint8_t glcd_buffer[(GLCD_LCD_WIDTH * GLCD_LCD_HEIGHT / 8) + 1];
 
 /**
  * Keeps track of bounding box of area on LCD which need to be
@@ -176,15 +176,16 @@ void glcd_bbox_refresh() {
 	memset(&glcd_bbox_selected->modified_rows_bitmask, 0xFF, sizeof(glcd_bbox_selected->modified_rows_bitmask));
 }
 
-void glcd_clear(void) {
-	memset(glcd_buffer_selected, 0x00, GLCD_LCD_WIDTH * GLCD_LCD_HEIGHT / 8);
-	glcd_update_bbox(0,0,GLCD_LCD_WIDTH - 1,GLCD_LCD_HEIGHT - 1);
-	glcd_write();
-}
+
 
 void glcd_clear_buffer(void) {
 	memset(glcd_buffer_selected, 0x00, GLCD_LCD_WIDTH * GLCD_LCD_HEIGHT / 8);
 	glcd_update_bbox(0,0,GLCD_LCD_WIDTH - 1,GLCD_LCD_HEIGHT - 1);
+}
+
+void glcd_clear(void) {
+    glcd_clear_buffer();
+    glcd_write();
 }
 
 void glcd_select_screen(uint8_t *buffer, glcd_BoundingBox_t *bbox)
@@ -193,6 +194,7 @@ void glcd_select_screen(uint8_t *buffer, glcd_BoundingBox_t *bbox)
 	glcd_bbox_selected = bbox;
 }
 
+#if 0
 void glcd_scroll_line(void)
 {
 	uint8_t y;
@@ -208,6 +210,7 @@ void glcd_scroll_line(void)
 	}
 	glcd_update_bbox(0,0,GLCD_LCD_WIDTH - 1,GLCD_LCD_HEIGHT - 1);
 }
+#endif
 
 
 #ifdef GLCD_USE_CORTEX_M3_INSTRUCTIONS

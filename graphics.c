@@ -56,6 +56,18 @@ glcd_screen_rotation_mode_t glcd_get_screen_rotation(void) {
   return(glcd_screen_rotation);
 }
 
+typedef struct {
+  //uint8_t start_row_buffer_index;
+  uint32_t buffer_index;
+  uint8_t bitmask;
+} buffer_packing_struct_t;
+
+void glcd_get_buffer_pos(uint8_t x, uint8_t y, buffer_packing_struct_t *bps) {
+  //bps->start_row_buffer_index = 0;
+  bps->buffer_index = ((y/8)*GLCD_LCD_WIDTH) + x;
+  bps->bitmask = GLCD_BUFFER_BYTE_MASK(y);
+}
+
 static void glcd_rotate_pixels(uint8_t *x, uint8_t *y) {
   const uint8_t x_orig = *x;
   const uint8_t y_orig = *y;
@@ -78,7 +90,7 @@ static void glcd_rotate_pixels(uint8_t *x, uint8_t *y) {
   }
 }
 
-void glcd_set_screen_buffer(uint8_t color) {
+void glcd_set_screen_buffer(const uint8_t color) {
   if( color ) {
     memset(glcd_buffer, 0xFF, sizeof(glcd_buffer));
   } else {
@@ -88,27 +100,32 @@ void glcd_set_screen_buffer(uint8_t color) {
 }
 
 /* Based on PCD8544 library by Limor Fried */
-void glcd_set_pixel(uint8_t x, uint8_t y, uint8_t color) {
+void glcd_set_pixel(uint8_t x, uint8_t y, const uint8_t color) {
     glcd_rotate_pixels(&x, &y);
 	if (x > (GLCD_LCD_WIDTH-1) || y > (GLCD_LCD_HEIGHT-1)) {
 		/* don't do anything if x/y is outside bounds of display size */
 		return;
 	}
 
-	const uint32_t buffer_index = (x+ (y/8)*GLCD_LCD_WIDTH);
-	const uint8_t old_value = glcd_buffer[buffer_index];
+	buffer_packing_struct_t bps;
+	glcd_get_buffer_pos(x, y, &bps);
+
+	//const uint32_t buffer_index = ((y/8) * GLCD_LCD_WIDTH) + x;
+	const uint8_t old_value = glcd_buffer[bps.buffer_index];
 	if (color) {
 		/* Set black */
-		glcd_buffer[buffer_index] |= GLCD_BUFFER_BYTE_MASK(y);
+		glcd_buffer[bps.buffer_index] |= bps.bitmask;
 	} else {
 		/* Set white */
-		glcd_buffer[buffer_index] &= ~(GLCD_BUFFER_BYTE_MASK(y));
+		glcd_buffer[bps.buffer_index] &= ~(bps.bitmask);
 	}
 
-	if( old_value != glcd_buffer[buffer_index] ) {
+	if( old_value != glcd_buffer[bps.buffer_index] ) {
 	  glcd_update_bbox(x,y,x,y);
 	}
 }
+
+
 
 /* Based on PCD8544 library by Limor Fried */
 uint8_t glcd_get_pixel(uint8_t x, uint8_t y) {
@@ -117,7 +134,10 @@ uint8_t glcd_get_pixel(uint8_t x, uint8_t y) {
 		return 0;
 	}
 	
-	if ( glcd_buffer[x+ (y/8)*GLCD_LCD_WIDTH] & (GLCD_BUFFER_BYTE_MASK(y)) ) {
+    buffer_packing_struct_t bps;
+    glcd_get_buffer_pos(x, y, &bps);
+
+	if ( glcd_buffer[bps.buffer_index]  & (bps.bitmask) ) {
 		return 1;
 	} else {
 		return 0;
@@ -129,7 +149,11 @@ void glcd_invert_pixel(uint8_t x, uint8_t y) {
 	if ((x >= GLCD_LCD_WIDTH) || (y >= GLCD_LCD_HEIGHT)) {
 		return;
 	}
-	glcd_buffer[x+ (y/8)*GLCD_LCD_WIDTH] ^= ( GLCD_BUFFER_BYTE_MASK(y));
+
+	buffer_packing_struct_t bps;
+	glcd_get_buffer_pos(x, y, &bps);
+
+	glcd_buffer[bps.buffer_index] ^= (bps.bitmask);
 	glcd_update_bbox(x,y,x,y);
 }
 
