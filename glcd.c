@@ -112,7 +112,7 @@ void glcd_update_bbox(uint8_t xmin, uint8_t ymin, uint8_t xmax, uint8_t ymax)
 		ymax = GLCD_LCD_HEIGHT-1;
 	}
 
-#if 1
+#if 0
     for(int v = ymin; v <= ymax; v++ ) {
       const uint32_t byte_offset = v / 8;
       const uint32_t bit_offset = v % 8;

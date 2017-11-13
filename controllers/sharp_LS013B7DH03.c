@@ -62,7 +62,7 @@ void sharp_lcd_clear_screen(void)
 }
 
 #define GLCD_DIRTY_ROW_WRITES    1
-uint32_t row_write_count = 0;
+//uint32_t row_write_count = 0;
 
 void glcd_write_bounded(const int ymin, const int ymax)
 {
@@ -72,22 +72,19 @@ void glcd_write_bounded(const int ymin, const int ymax)
   if( ymin >= 0 ) {
     y_row = ymin;
   } else if( glcd_bbox_selected != NULL ) {
-    y_row = glcd_bbox_selected->y_min;
+    //FIXME for some reason, when text is written the bounding box values are not updated properly
+    //y_row = glcd_bbox_selected->y_min;
   }
 
   if( ymax >= 0 ) {
     y_row_max = ymax;
   } else if( glcd_bbox_selected != NULL ) {
-    y_row_max = glcd_bbox_selected->y_max;
+    //FIXME for some reason, when text is written the bounding box values are not updated properly
+    //y_row_max = glcd_bbox_selected->y_max;
   }
 
-  //FIXME for some reason, when text is written the bounding box values are not updated properly
-  y_row_max = MLCD_YRES - 1;
-  y_row = 0;
 
-
-
-  row_write_count = 0;
+  //row_write_count = 0;
   for(; y_row <= y_row_max && y_row >= 0 && y_row < MLCD_YRES; y_row++ ) {
 #if GLCD_DIRTY_ROW_WRITES
     if( glcd_bbox_selected != NULL ) {
@@ -97,7 +94,7 @@ void glcd_write_bounded(const int ymin, const int ymax)
         //Row dirty bit check
         continue;
       } else {
-        row_write_count++;
+        //row_write_count++;
       }
     }
 #endif
@@ -121,16 +118,11 @@ void glcd_write_bounded(const int ymin, const int ymax)
     glcd_spi_write_multibyte(sizeof(cmd_buff), cmd_buff);
     GLCD_SELECT();
 
-#if 0
-    chThdSleepMicroseconds(6);
-#else
     for(int i = 0; i < 500; i++ ) {
       //This loop need to burn about 6 micro seconds to satisfy the sharp LCD Minimum SCS low time
       __NOP();
     }
-#endif
   }
-
 
   /* Display updated, we can reset the bounding box */
   glcd_reset_bbox();
