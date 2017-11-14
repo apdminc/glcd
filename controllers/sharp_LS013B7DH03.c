@@ -4,59 +4,16 @@
 
 #include "string.h"
 
-
-void glcd_command(uint8_t c)
-{
-}
-
-void glcd_data(uint8_t c)
-{
-}
-
-void glcd_set_contrast(uint8_t val)
-{
-}
-
-void glcd_power_down(void)
-{
-}
-
-void glcd_power_up(void)
-{
-}
-
-void glcd_set_y_address(uint8_t y)
-{
-}
-
-void glcd_set_x_address(uint8_t x)
-{
-}
-
-
-static uint8_t to_lsb(uint8_t v)
-{
-#if 1
-  /*
-   * This assumes that the SPI peripheral is in LSB mode.
-   */
-  return(v);
-#else
-  /*
-   * This assumes that the SPI peripheral is in MSB mode.
-   */
-  return(glcd_reverse_significant_bits(v));
-#endif
-}
+#define SHARP_LCD_WRITE_ROW_COMMAND_LENGTH    (1 + 1 + MLCD_BYTES_LINE + 2)
+static uint8_t sharp_lcd_cmd_buff[SHARP_LCD_WRITE_ROW_COMMAND_LENGTH];
 
 void sharp_lcd_clear_screen(void)
 {
-  static uint8_t cmd_buff[2];
-  cmd_buff[0] = MLCD_CM_MSB;
-  cmd_buff[1] = 0;
+  sharp_lcd_cmd_buff[0] = MLCD_CM_MSB;
+  sharp_lcd_cmd_buff[1] = 0;
 
   GLCD_DESELECT();
-  glcd_spi_write_multibyte(sizeof(cmd_buff), cmd_buff);
+  glcd_spi_write_multibyte(2, sharp_lcd_cmd_buff);
   GLCD_SELECT();
 }
 
@@ -82,6 +39,10 @@ void glcd_write_bounded(const int ymin, const int ymax)
     //y_row_max = glcd_bbox.y_max;
   }
 
+  //[command:1 byte][line:1 byte][pixels: 128/8 bytes][trailer: 2 bytes, timing requirement] See datasheet for details
+
+  memset(sharp_lcd_cmd_buff, 0, sizeof(sharp_lcd_cmd_buff));
+  sharp_lcd_cmd_buff[0] = MLCD_WR_MSB;
 
   for(; y_row <= y_row_max && y_row >= 0 && y_row < MLCD_YRES; y_row++ ) {
 #if GLCD_DIRTY_ROW_WRITES
@@ -93,23 +54,32 @@ void glcd_write_bounded(const int ymin, const int ymax)
     }
 #endif
 
-    //[command:1 byte][line:1 byte][pixels: 128/8 bytes][trailer: 2 bytes, timing requirement] See datasheet for details
-    static uint8_t cmd_buff[1 + 1 + MLCD_BYTES_LINE + 2];
-    memset(cmd_buff, 0, sizeof(cmd_buff));
-    cmd_buff[0] = MLCD_WR_MSB;
-
-    for(int i = 0; i < (GLCD_LCD_HEIGHT/8); i++ ) {
-#if GLCD_MSB_BUFFER_PACKING
-      cmd_buff[2 + ((GLCD_LCD_HEIGHT/8) - 1 - i)] = glcd_reverse_significant_bits(glcd_buffer[y_row + (i * GLCD_LCD_WIDTH)]);
+#if GLCD_LSB_STRAIGT_BUFFER_PACKING
+#if 1
+    buffer_packing_struct_t bps;
+    glcd_get_buffer_pos(0, y_row, &bps);
+    memcpy(&sharp_lcd_cmd_buff[2], &glcd_buffer[bps.start_row_buffer_index], (GLCD_LCD_WIDTH/8));
 #else
-      cmd_buff[2 + ((GLCD_LCD_HEIGHT/8) - 1 - i)] = glcd_buffer[y_row + (i * GLCD_LCD_WIDTH)];
+    for(uint8_t x_columns = 0; x_columns < GLCD_LCD_HEIGHT; x_columns += 8 ) {
+      buffer_packing_struct_t bps;
+      glcd_get_buffer_pos(x_columns, y_row, &bps);
+      sharp_lcd_cmd_buff[2 + (x_columns/8)] = glcd_buffer[bps.buffer_index];
+    }
+#endif
+#else
+    for(int x_columns = 0; x_columns < (GLCD_LCD_HEIGHT/8); x_columns++ ) {
+#if GLCD_MSB_BUFFER_PACKING
+      sharp_lcd_cmd_buff[2 + ((GLCD_LCD_HEIGHT/8) - 1 - x_columns)] = glcd_reverse_significant_bits(glcd_buffer[y_row + (x_columns * GLCD_LCD_WIDTH)]);
+#else
+      sharp_lcd_cmd_buff[2 + ((GLCD_LCD_HEIGHT/8) - 1 - x_columns)] = glcd_buffer[y_row + (x_columns * GLCD_LCD_WIDTH)];
 #endif
     }
+#endif
 
-    cmd_buff[1] = to_lsb(y_row + 1);//lines are 1-based on the LCD itself
+    sharp_lcd_cmd_buff[1] = y_row + 1;//lines are 1-based on the LCD itself
 
     GLCD_DESELECT();
-    glcd_spi_write_multibyte(sizeof(cmd_buff), cmd_buff);
+    glcd_spi_write_multibyte(SHARP_LCD_WRITE_ROW_COMMAND_LENGTH, sharp_lcd_cmd_buff);
     GLCD_SELECT();
 
     for(int i = 0; i < 500; i++ ) {

@@ -40,6 +40,11 @@
 /** \addtogroup GlobalVars Global Variables
  *  @{
  */
+#if GLCD_MSB_BUFFER_PACKING || GLCD_LSB_STRAIGT_BUFFER_PACKING
+#  define GLCD_BUFFER_BYTE_MASK(v) (1 << (v % 8))
+#else
+#  define GLCD_BUFFER_BYTE_MASK(v) (0x80 >> (v % 8))
+#endif
 
 /**
  *  Screen buffer
@@ -54,14 +59,25 @@ uint8_t glcd_buffer[(GLCD_LCD_WIDTH * GLCD_LCD_HEIGHT / 8) + 1];
  */
 glcd_BoundingBox_t glcd_bbox;
 
+uint8_t current_foreground_color = WHITE;
+uint8_t current_background_color = BLACK;
 
 /**
  * The current screen orientation
  */
 glcd_screen_rotation_mode_t glcd_screen_rotation = GLCD_SCREEN_ROTATION_0_DEGREES;
 
-uint8_t current_foreground_color = WHITE;
-uint8_t current_background_color = BLACK;
+void glcd_get_buffer_pos(uint8_t x, uint8_t y, buffer_packing_struct_t *bps) {
+#if ((1) || GLCD_LSB_STRAIGT_BUFFER_PACKING)
+  bps->start_row_buffer_index = (y * (GLCD_LCD_WIDTH/8));
+  bps->buffer_index = bps->start_row_buffer_index + (x/8);
+  bps->bitmask = GLCD_BUFFER_BYTE_MASK(x);
+#else
+  bps->start_row_buffer_index = 0;//((y/8)*GLCD_LCD_WIDTH);
+  bps->buffer_index = ((y/8)*GLCD_LCD_WIDTH) + x;
+  bps->bitmask = GLCD_BUFFER_BYTE_MASK(y);
+#endif
+}
 
 uint8_t glcd_get_foreground_color(void) {
   return(current_foreground_color);
@@ -98,7 +114,7 @@ void glcd_update_bbox(uint8_t xmin, uint8_t ymin, uint8_t xmax, uint8_t ymax)
 		ymax = GLCD_LCD_HEIGHT-1;
 	}
 
-#if 0
+#if GLCD_LSB_STRAIGT_BUFFER_PACKING
     for(int v = ymin; v <= ymax; v++ ) {
       const uint32_t byte_offset = v / 8;
       const uint32_t bit_offset = v % 8;

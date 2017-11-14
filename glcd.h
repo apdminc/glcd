@@ -41,6 +41,8 @@
 #define CHIBIOS_SPI_PEREPHERIAL       &SPID5
 #define CHIBIOS_UART_SPI_PEREPHERIAL  &UARTD3
 
+
+#define GLCD_LSB_STRAIGT_BUFFER_PACKING   1
 #define GLCD_MSB_BUFFER_PACKING       0
 
 
@@ -108,17 +110,6 @@
 #include "glcd_text.h"
 #include "unit_tests.h"
 
-/**
- * \name Colour Constants
- * @{
- */
-#ifndef BLACK
-  #define BLACK 1
-#endif
-#ifndef WHITE
-  #define WHITE 0
-#endif
-
 
 /**@}*/
 
@@ -127,38 +118,10 @@
  * @{
  */
 
-/* Set to custom value, or leave at 0 for automatic assignment. */ 
-
-/**
- * User specified GLCD width in pixels
- * Set to 0 for automatic assignment based on controller
- */
-#define GLCD_LCD_WIDTH  0
-
-/**
- * User specified GLCD height in pixels
- * Set to 0 for automatic assignment based on controller
- */
-
-#define GLCD_LCD_HEIGHT 0
-
 /* Automatic assignment of width and height, if required. */
-#if !GLCD_LCD_WIDTH && !GLCD_LCD_HEIGHT
-	#undef GLCD_LCD_WIDTH
-	#undef GLCD_LCD_HEIGHT
-	#if defined(GLCD_CONTROLLER_PCD8544)
-		#define GLCD_LCD_WIDTH 84
-		#define GLCD_LCD_HEIGHT 48
-	#elif defined(GLCD_CONTROLLER_ST7565R) || defined(GLCD_CONTROLLER_NT75451)
-		#define GLCD_LCD_WIDTH 128
-		#define GLCD_LCD_HEIGHT 64
-    #elif defined(GLCD_CONTROLLER_SHARP_LS013B7DH03)
-        #define GLCD_LCD_WIDTH 128
-        #define GLCD_LCD_HEIGHT 128
-	#else
-		#define GLCD_LCD_WIDTH 128
-		#define GLCD_LCD_HEIGHT 64
-	#endif
+#if defined(GLCD_CONTROLLER_SHARP_LS013B7DH03)
+    #define GLCD_LCD_WIDTH  128
+    #define GLCD_LCD_HEIGHT 128
 #endif
 
 /*
@@ -189,6 +152,12 @@ typedef struct {
 	uint8_t modified_rows_bitmask[MODIFIED_ROWS_SIZE];
 } glcd_BoundingBox_t;
 
+typedef struct {
+  uint32_t start_row_buffer_index;
+  uint32_t buffer_index;
+  uint8_t bitmask;
+} buffer_packing_struct_t;
+
 typedef enum {
   GLCD_SCREEN_ROTATION_0_DEGREES = 0,
   GLCD_SCREEN_ROTATION_90_DEGREES = 90,
@@ -201,9 +170,12 @@ extern uint8_t glcd_buffer[(GLCD_LCD_WIDTH * GLCD_LCD_HEIGHT / 8) + 1];
 extern glcd_BoundingBox_t glcd_bbox;
 extern glcd_screen_rotation_mode_t glcd_screen_rotation;
 
-/** \name Base Functions 
+
+/** \name Base Functions
  *  @{
  */
+
+void glcd_get_buffer_pos(uint8_t x, uint8_t y, buffer_packing_struct_t *bps);
 
 uint8_t glcd_get_foreground_color(void);
 uint8_t glcd_get_background_color(void);
@@ -261,11 +233,8 @@ glcd_screen_rotation_mode_t glcd_get_screen_rotation(void);
  */
 uint8_t glcd_reverse_significant_bits(uint32_t value);
 
-
 /** @}*/
-
 enum font_table_type { STANG, MIKRO };
-
 
 typedef struct {
 	const char *font_table;

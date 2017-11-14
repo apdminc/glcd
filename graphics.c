@@ -42,11 +42,7 @@
 #include <string.h>
 #include "glcd.h"
 
-#if GLCD_MSB_BUFFER_PACKING
-#  define GLCD_BUFFER_BYTE_MASK(y) (1 << (y % 8))
-#else
-#  define GLCD_BUFFER_BYTE_MASK(y) (0x80 >> (y % 8))
-#endif
+
 
 void glcd_set_screen_rotation(const glcd_screen_rotation_mode_t mode) {
   glcd_screen_rotation = mode;
@@ -56,22 +52,29 @@ glcd_screen_rotation_mode_t glcd_get_screen_rotation(void) {
   return(glcd_screen_rotation);
 }
 
-typedef struct {
-  //uint8_t start_row_buffer_index;
-  uint32_t buffer_index;
-  uint8_t bitmask;
-} buffer_packing_struct_t;
-
-void glcd_get_buffer_pos(uint8_t x, uint8_t y, buffer_packing_struct_t *bps) {
-  //bps->start_row_buffer_index = 0;
-  bps->buffer_index = ((y/8)*GLCD_LCD_WIDTH) + x;
-  bps->bitmask = GLCD_BUFFER_BYTE_MASK(y);
-}
 
 static void glcd_rotate_pixels(uint8_t *x, uint8_t *y) {
   const uint8_t x_orig = *x;
   const uint8_t y_orig = *y;
-
+#if GLCD_LSB_STRAIGT_BUFFER_PACKING
+  switch(glcd_screen_rotation) {
+      case GLCD_SCREEN_ROTATION_0_DEGREES:
+        *x = GLCD_LCD_WIDTH - 1 - y_orig;
+        *y = x_orig;
+        break;
+      case GLCD_SCREEN_ROTATION_90_DEGREES:
+        //do nothing, line packing is already correct
+        break;
+      case GLCD_SCREEN_ROTATION_180_DEGREES:
+        *x = y_orig;
+        *y = GLCD_LCD_HEIGHT - 1 - x_orig;
+        break;
+      case GLCD_SCREEN_ROTATION_270_DEGREES:
+        *x = GLCD_LCD_WIDTH - 1 - x_orig;
+        *y = GLCD_LCD_HEIGHT - 1 - y_orig;
+        break;
+    }
+#else
   switch(glcd_screen_rotation) {
     case GLCD_SCREEN_ROTATION_0_DEGREES:
       break;
@@ -88,6 +91,7 @@ static void glcd_rotate_pixels(uint8_t *x, uint8_t *y) {
       *y = x_orig;
       break;
   }
+#endif
 }
 
 void glcd_set_screen_buffer(const uint8_t color) {
@@ -137,7 +141,7 @@ uint8_t glcd_get_pixel(uint8_t x, uint8_t y) {
     buffer_packing_struct_t bps;
     glcd_get_buffer_pos(x, y, &bps);
 
-	if ( glcd_buffer[bps.buffer_index]  & (bps.bitmask) ) {
+	if ( glcd_buffer[bps.buffer_index] & (bps.bitmask) ) {
 		return 1;
 	} else {
 		return 0;
@@ -312,7 +316,6 @@ void glcd_draw_circle_section(const int16_t x0, const int16_t y0, const uint16_t
 
 void glcd_draw_circle(uint8_t x0, uint8_t y0, uint8_t r, uint8_t color)
 {
-		
 	int8_t f = 1 - r;
 	int8_t ddF_x = 1;
 	int8_t ddF_y = -2 * r;
@@ -435,12 +438,4 @@ void glcd_invert_area(uint8_t x, uint8_t y, uint8_t w, uint8_t h)
 			glcd_invert_pixel(xx,yy);
 		}
 	}
-}
-
-void glcd_draw_bitmap(const unsigned char *data)
-{
-	/* Copy bitmap data to the screen buffer */
-	memcpy(glcd_buffer, data, (GLCD_LCD_WIDTH * GLCD_LCD_HEIGHT / 8));
-
-	glcd_bbox_refresh(); 
 }

@@ -67,7 +67,7 @@ uint8_t glcd_get_current_font_width(void);
  *  \param line line number to be written (each line is 8 pixels high)
  *  \param c    char to be written
  */
-void glcd_tiny_draw_char(uint8_t x, uint8_t line, char c);
+//void glcd_tiny_draw_char(uint8_t x, uint8_t line, char c);
 
 /** Write string to display buffer in tiny 5x7 font.
  *  Will wrap to next line if needed. Screen is not updated. Use glcd_write() to physically update display.
@@ -75,7 +75,7 @@ void glcd_tiny_draw_char(uint8_t x, uint8_t line, char c);
  *  \param line line number to be written (each line is 8 pixels high)
  *  \param str  string to be written
  */
-void glcd_tiny_draw_string(uint8_t x, uint8_t line, char *str);
+//void glcd_tiny_draw_string(uint8_t x, uint8_t line, char *str);
 
 /**
  * Invert all contents of line number. Line 0 is the top most line.

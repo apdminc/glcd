@@ -51,7 +51,7 @@ uint8_t glcd_get_current_font_height(void) {
 uint8_t glcd_get_current_font_width(void) {
   return(font_current.width);
 }
-
+#if 0
 void glcd_tiny_draw_char(uint8_t x, uint8_t line, char c)
 {
 	uint8_t i;
@@ -73,11 +73,15 @@ void glcd_tiny_draw_char(uint8_t x, uint8_t line, char c)
 	glcd_update_bbox(x, line*(font_current.height + 1), x+font_current.width, line*(font_current.height + 1) + (font_current.height + 1));
 	
 	for ( i = 0; i < font_current.width; i++ ) {
+	    //buffer_packing_struct_t bps;
+	    //glcd_get_buffer_pos(x, line, &bps);
+
 		glcd_buffer[x + (line * GLCD_LCD_WIDTH)] = *( font_current.font_table + ((c - font_current.start_char) * (font_current.width)) + i );
 		glcd_update_bbox(x, line, x, line + font_current.width);
 		x++;
 	}
 }
+
 
 void glcd_tiny_draw_string(uint8_t x, uint8_t line, char *str)
 {
@@ -95,6 +99,7 @@ void glcd_tiny_draw_string(uint8_t x, uint8_t line, char *str)
 			return; /* Ran out of space :( */
 	}
 }
+#endif
 
 void glcd_tiny_invert_line(uint8_t line)
 {
