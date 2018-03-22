@@ -3,6 +3,10 @@
 #if defined(GLCD_CONTROLLER_SHARP_LS013B7DH03)
 
 #include "string.h"
+#include "project_common_stm32.h"
+
+#define SHARP_SPI_SCS_SETUP_US        2
+#define SHARP_SPI_SCS_HOLD_US         15
 
 #define SHARP_LCD_WRITE_ROW_COMMAND_LENGTH    (1 + 1 + MLCD_BYTES_LINE + 2)
 static uint8_t sharp_lcd_cmd_buff[SHARP_LCD_WRITE_ROW_COMMAND_LENGTH];
@@ -13,7 +17,9 @@ void sharp_lcd_clear_screen(void)
   sharp_lcd_cmd_buff[1] = 0;
 
   GLCD_DESELECT();
+  delay_microseconds2(SHARP_SPI_SCS_SETUP_US);
   glcd_spi_write_multibyte(2, sharp_lcd_cmd_buff);
+  delay_microseconds2(SHARP_SPI_SCS_HOLD_US);
   GLCD_SELECT();
 }
 
@@ -41,7 +47,7 @@ void glcd_write_bounded(const int ymin, const int ymax)
 
   //[command:1 byte][line:1 byte][pixels: 128/8 bytes][trailer: 2 bytes, timing requirement] See datasheet for details
 
-  memset(sharp_lcd_cmd_buff, 0, sizeof(sharp_lcd_cmd_buff));
+  //memset(sharp_lcd_cmd_buff, 0, sizeof(sharp_lcd_cmd_buff));
   sharp_lcd_cmd_buff[0] = MLCD_WR_MSB;
 
   for(; y_row <= y_row_max && y_row >= 0 && y_row < MLCD_YRES; y_row++ ) {
@@ -79,13 +85,15 @@ void glcd_write_bounded(const int ymin, const int ymax)
     sharp_lcd_cmd_buff[1] = y_row + 1;//lines are 1-based on the LCD itself
 
     GLCD_DESELECT();
+    delay_microseconds2(SHARP_SPI_SCS_SETUP_US);
     glcd_spi_write_multibyte(SHARP_LCD_WRITE_ROW_COMMAND_LENGTH, sharp_lcd_cmd_buff);
+    delay_microseconds2(SHARP_SPI_SCS_HOLD_US);
     GLCD_SELECT();
 
-    for(int i = 0; i < 500; i++ ) {
+    //for(int i = 0; i < 500; i++ ) {
       //This loop need to burn about 6 micro seconds to satisfy the sharp LCD Minimum SCS low time
-      __NOP();
-    }
+      //__NOP();
+    //}
   }
 
   /* Display updated, we can reset the bounding box */
