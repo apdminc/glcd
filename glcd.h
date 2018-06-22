@@ -205,11 +205,6 @@ void glcd_update_bbox(uint8_t xmin, uint8_t ymin, uint8_t xmax, uint8_t ymax);
 void glcd_reset_bbox(void);
 
 /**
- * Same as glcd_reset_bbox()
- */
-void glcd_bbox_reset(void);
-
-/**
  * Marks the entire display for re-writing.
  */
 void glcd_bbox_refresh(void);

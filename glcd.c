@@ -158,10 +158,6 @@ void glcd_reset_bbox()
 	memset(&glcd_bbox.modified_rows_bitmask, 0x00, sizeof(glcd_bbox.modified_rows_bitmask));
 }
 
-void glcd_bbox_reset() {
-	glcd_reset_bbox();
-}
-
 void glcd_bbox_refresh() {
 	/* Marks bounding box as entire screen, so on next glcd_write(), it writes the entire buffer to the LCD */
 	glcd_bbox.x_min = 0;
@@ -171,8 +167,6 @@ void glcd_bbox_refresh() {
 
 	memset(&glcd_bbox.modified_rows_bitmask, 0xFF, sizeof(glcd_bbox.modified_rows_bitmask));
 }
-
-
 
 void glcd_clear_buffer(void) {
 	memset(glcd_buffer, 0x00, sizeof(glcd_buffer));
