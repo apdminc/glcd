@@ -95,6 +95,38 @@ void glcd_set_foreground_color(uint8_t color) {
   current_background_color = (color == BLACK ? WHITE : BLACK);
 }
 
+
+/**
+ * Used by LCD bitmap serial encapsulation protocol
+ */
+bool glcd_is_export_row_dirty(const uint8_t row_number) {
+  bool ret = false;
+  const uint32_t byte_offset = row_number / 8;
+  const uint32_t bit_offset = row_number % 8;
+  if( glcd_bbox.modified_rows_bitmask2[byte_offset] & (1<<bit_offset) ) {
+    return(true);
+  }
+  return(ret);
+}
+
+void glcd_mark_export_row_clean(const uint8_t row_number) {
+  const uint32_t byte_offset = row_number / 8;
+  const uint32_t bit_offset = row_number % 8;
+
+  glcd_bbox.modified_rows_bitmask2[byte_offset] &= ~(1<<bit_offset);
+}
+
+uint8_t* glcd_get_export_row_pointer(const uint8_t row_number) {
+  glcd_mark_export_row_clean(row_number);
+
+  buffer_packing_struct_t bps;
+  glcd_get_buffer_pos(0, row_number, &bps);
+  //memcpy(&sharp_lcd_cmd_buff[2], &glcd_buffer[bps.start_row_buffer_index], (GLCD_LCD_WIDTH/8));
+  uint8_t *ret = &glcd_buffer[bps.start_row_buffer_index];
+
+  return(ret);
+}
+
 /** @} */
 
 void glcd_update_bbox(uint8_t xmin, uint8_t ymin, uint8_t xmax, uint8_t ymax)
@@ -120,6 +152,7 @@ void glcd_update_bbox(uint8_t xmin, uint8_t ymin, uint8_t xmax, uint8_t ymax)
       const uint32_t bit_offset = v % 8;
       if( byte_offset < sizeof(glcd_bbox.modified_rows_bitmask) ) {
         glcd_bbox.modified_rows_bitmask[byte_offset] |= (1<<bit_offset);
+        glcd_bbox.modified_rows_bitmask2[byte_offset] |= (1<<bit_offset);
       }
     }
 #else
@@ -128,6 +161,7 @@ void glcd_update_bbox(uint8_t xmin, uint8_t ymin, uint8_t xmax, uint8_t ymax)
       const uint32_t bit_offset = v % 8;
       if( byte_offset < sizeof(glcd_bbox.modified_rows_bitmask) ) {
         glcd_bbox.modified_rows_bitmask[byte_offset] |= (1<<bit_offset);
+        glcd_bbox.modified_rows_bitmask2[byte_offset] |= (1<<bit_offset);
       }
     }
 #endif
@@ -156,6 +190,7 @@ void glcd_reset_bbox()
 	glcd_bbox.y_max = 0;
 
 	memset(&glcd_bbox.modified_rows_bitmask, 0x00, sizeof(glcd_bbox.modified_rows_bitmask));
+	memset(&glcd_bbox.modified_rows_bitmask2, 0x00, sizeof(glcd_bbox.modified_rows_bitmask2));
 }
 
 void glcd_bbox_refresh() {
@@ -166,6 +201,7 @@ void glcd_bbox_refresh() {
 	glcd_bbox.y_max = GLCD_LCD_HEIGHT -1;
 
 	memset(&glcd_bbox.modified_rows_bitmask, 0xFF, sizeof(glcd_bbox.modified_rows_bitmask));
+	memset(&glcd_bbox.modified_rows_bitmask2, 0xFF, sizeof(glcd_bbox.modified_rows_bitmask2));
 }
 
 void glcd_clear_buffer(void) {

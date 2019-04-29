@@ -150,6 +150,7 @@ typedef struct {
 	uint8_t y_max;
 
 	uint8_t modified_rows_bitmask[MODIFIED_ROWS_SIZE];
+	uint8_t modified_rows_bitmask2[MODIFIED_ROWS_SIZE];//Used by UART LCD export
 } glcd_BoundingBox_t;
 
 typedef struct {
@@ -180,6 +181,10 @@ void glcd_get_buffer_pos(uint8_t x, uint8_t y, buffer_packing_struct_t *bps);
 uint8_t glcd_get_foreground_color(void);
 uint8_t glcd_get_background_color(void);
 void glcd_set_foreground_color(uint8_t color);
+
+void glcd_mark_export_row_clean(const uint8_t row_number);
+bool glcd_is_export_row_dirty(const uint8_t row_number);
+uint8_t* glcd_get_export_row_pointer(const uint8_t row_number);
 
 /**
  * Update bounding box.
